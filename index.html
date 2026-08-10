@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>楽Shop Converter v0.4</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--ink:#171a21;--muted:#6b7280;--line:#e5e7eb;
+  --accent:#6d5dfc;--accent2:#4f46e5;--ok:#0f9d69;--warn:#b7791f;--bad:#d14343;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,"Noto Sans JP",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#171a21,#2b2f3a);color:#fff;padding:34px 20px}
+.wrap{max-width:1100px;margin:0 auto}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand h1{font-size:26px;margin:0}.badge{font-size:12px;background:#ffffff18;border:1px solid #ffffff32;padding:6px 10px;border-radius:999px}
+header p{margin:10px 0 0;color:#d5d8e0;max-width:780px;line-height:1.7}
+main{padding:24px 20px 48px}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,.04)}
+h2{font-size:18px;margin:0 0 14px}.sub{color:var(--muted);font-size:13px;line-height:1.6}
+.drop{border:2px dashed #c7c9d4;border-radius:14px;padding:34px 18px;text-align:center;background:#fafaff;transition:.15s}
+.drop.drag{border-color:var(--accent);background:#f2f0ff}.drop strong{display:block;margin-bottom:6px}
+input[type=file]{margin-top:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer}
+.primary{background:var(--accent);color:white}.primary:hover{background:var(--accent2)}
+.secondary{background:#eef0f5;color:#262b35}.danger{background:#fff0f0;color:var(--bad)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.stat{background:#f7f8fb;border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--muted)}
+.notice{font-size:13px;padding:11px 12px;border-radius:10px;margin-top:12px}
+.info{background:#eef4ff;color:#274472}.ok{background:#eaf8f2;color:#176a4b}.warn{background:#fff8e8;color:#805d16}.bad{background:#fff0f0;color:#8e2f2f}
+.mapping{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+label{font-size:12px;color:var(--muted);display:block}
+select,input[type=text]{width:100%;margin-top:5px;padding:9px 10px;border:1px solid #d5d8e0;border-radius:9px;background:white}
+.full{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:#f8f9fb;z-index:1}
+.scroll{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:12px}
+.issue{padding:9px 10px;border-bottom:1px solid var(--line);font-size:13px}.issue:last-child{border-bottom:0}
+footer{color:var(--muted);font-size:12px;text-align:center;padding-top:20px}
+.hidden{display:none!important}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.mapping{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <h1>楽Shop Converter</h1>
+      <span class="badge">Preview v0.4 / Free 20 products</span>
+    </div>
+    <p>楽天の商品CSVを読み込み、Shopify商品CSVへ変換します。処理はブラウザ内で行い、このページから商品データを外部サーバーへ送信しません。</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <h2>1. 楽天CSVを読み込む</h2>
+      <div id="drop" class="drop">
+        <strong>CSVをここにドラッグ＆ドロップ</strong>
+        <div class="sub">UTF-8 / Shift_JIS を自動判定します。Free版は先頭20商品まで出力します。</div>
+        <input id="file" type="file" accept=".csv,text/csv">
+      </div>
+      <div id="fileInfo" class="notice info hidden"></div>
+      <div class="stats">
+        <div class="stat"><b id="rowCount">0</b><span>読み込み行</span></div>
+        <div class="stat"><b id="productCount">0</b><span>推定商品数</span></div>
+        <div class="stat"><b id="issueCount">0</b><span>検出事項</span></div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button id="sampleBtn" class="secondary">サンプルCSV</button>
+        <button id="resetBtn" class="danger">リセット</button>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2>変換状況</h2>
+      <div id="status" class="notice info">CSVを読み込むと自動解析します。</div>
+      <div class="row" style="margin-top:14px">
+        <button id="convertBtn" class="primary" disabled>Shopify CSVを作成</button>
+      </div>
+      <p class="sub">出力はExcelでも開きやすいUTF-8 BOM付きCSVです。</p>
+    </aside>
+  </div>
+
+  <section id="mappingCard" class="card hidden" style="margin-top:18px">
+    <h2>2. 列の対応を確認</h2>
+    <p class="sub">自動判定が違う場合だけ変更してください。「未使用」でも変換できますが、商品名と価格は設定を推奨します。</p>
+    <div id="mapping" class="mapping"></div>
+  </section>
+
+  <section id="issuesCard" class="card hidden" style="margin-top:18px">
+    <h2>3. データチェック</h2>
+    <div id="issues"></div>
+  </section>
+
+  <section id="previewCard" class="card hidden" style="margin-top:18px">
+    <h2>4. Shopify CSVプレビュー</h2>
+    <div class="scroll"><table id="preview"></table></div>
+    <div class="row" style="margin-top:14px">
+      <button id="downloadBtn" class="primary">Shopify CSVをダウンロード</button>
+    </div>
+  </section>
+
+  <footer>Prototype tool. Shopify側のCSV仕様変更や楽天RMSの出力形式差異があるため、本番投入前に少量でテストしてください。</footer>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const state = {headers:[], rows:[], mapping:{}, output:[], issues:[], fileName:""};
+
+const fields = [
+  ["title","商品名","商品名|商品名称|item_name|item name|name|title"],
+  ["description","商品説明","商品説明|PC用商品説明文|スマートフォン用商品説明文|description|body|説明"],
+  ["price","販売価格","販売価格|商品価格|価格|price|item_price"],
+  ["sku","SKU","SKU|商品管理番号|商品番号|item_number|item code|商品コード"],
+  ["stock","在庫数","在庫数|在庫|stock|quantity|inventory"],
+  ["image","画像URL","画像URL|商品画像URL|画像|image|image url"],
+  ["vendor","販売元 / Vendor","ショップ名|店舗名|vendor|brand|メーカー"],
+  ["optionName","選択肢名","選択肢項目名|項目選択肢|option name|variant name"],
+  ["optionValue","選択肢値","選択肢値|項目選択肢別在庫用横軸選択肢|option value|variant value"],
+  ["handle","Handle元","商品管理番号|商品番号|item_number|handle|商品コード"]
+];
+
+function norm(s){return String(s??"").trim().toLowerCase().replace(/[\s_\-（）()【】\[\]]/g,"");}
+function escHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function slugify(s){
+  let x=String(s??"").trim().toLowerCase();
+  x=x.normalize("NFKC").replace(/[^\p{L}\p{N}]+/gu,"-").replace(/^-+|-+$/g,"");
+  if(!x) x="product-"+Math.random().toString(36).slice(2,10);
+  return x.slice(0,180);
+}
+function parseCSV(text){
+  const rows=[]; let row=[], cell="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(q){
+      if(c=='"' && n=='"'){cell+='"';i++}
+      else if(c=='"'){q=false}
+      else cell+=c;
+    }else{
+      if(c=='"') q=true;
+      else if(c==","){row.push(cell);cell=""}
+      else if(c=="\n"){row.push(cell);rows.push(row);row=[];cell=""}
+      else if(c=="\r"){}
+      else cell+=c;
+    }
+  }
+  if(cell.length || row.length){row.push(cell);rows.push(row)}
+  return rows.filter(r=>r.some(v=>String(v).trim()!==""));
+}
+function decodeBuffer(buf){
+  let text="", enc="UTF-8";
+  try{
+    text=new TextDecoder("utf-8",{fatal:true}).decode(buf);
+  }catch(e){
+    text=new TextDecoder("shift_jis").decode(buf); enc="Shift_JIS";
+  }
+  return {text:text.replace(/^\uFEFF/,""),enc};
+}
+function autoMap(headers){
+  const map={};
+  for(const [key,label,aliases] of fields){
+    const opts=aliases.split("|").map(norm);
+    let idx=headers.findIndex(h=>opts.includes(norm(h)));
+    if(idx<0) idx=headers.findIndex(h=>opts.some(a=>norm(h).includes(a)||a.includes(norm(h))));
+    map[key]=idx>=0?headers[idx]:"";
+  }
+  return map;
+}
+function buildMapping(){
+  const box=$("#mapping"); box.innerHTML="";
+  for(const [key,label] of fields){
+    const div=document.createElement("div");
+    div.innerHTML=`<label>${escHtml(label)}<select data-key="${key}"><option value="">未使用</option>${state.headers.map(h=>`<option value="${escHtml(h)}"${state.mapping[key]===h?" selected":""}>${escHtml(h)}</option>`).join("")}</select></label>`;
+    box.appendChild(div);
+  }
+  box.querySelectorAll("select").forEach(sel=>sel.addEventListener("change",()=>{
+    state.mapping[sel.dataset.key]=sel.value; analyze();
+  }));
+}
+function val(row,key){
+  const h=state.mapping[key]; if(!h) return "";
+  const i=state.headers.indexOf(h); return i>=0?String(row[i]??"").trim():"";
+}
+function productKey(row){
+  return val(row,"handle") || val(row,"sku") || val(row,"title");
+}
+function countProducts(){
+  const set=new Set(state.rows.map(productKey).filter(Boolean));
+  return set.size || state.rows.length;
+}
+function analyze(){
+  const issues=[];
+  if(!state.mapping.title) issues.push(["bad","商品名の列を特定できません。列の対応を選択してください。"]);
+  if(!state.mapping.price) issues.push(["warn","価格の列を特定できません。"]);
+  const skus=new Map();
+  state.rows.forEach((r,i)=>{
+    const t=val(r,"title"), p=val(r,"price"), sku=val(r,"sku"), stock=val(r,"stock"), img=val(r,"image");
+    if(!t) issues.push(["warn",`行 ${i+2}: 商品名が空です。`]);
+    if(p && isNaN(Number(String(p).replace(/[,￥¥]/g,"")))) issues.push(["warn",`行 ${i+2}: 価格「${p}」を数値として解釈できません。`]);
+    if(stock && isNaN(Number(String(stock).replace(/,/g,"")))) issues.push(["warn",`行 ${i+2}: 在庫「${stock}」を数値として解釈できません。`]);
+    if(img && !/^https?:\/\//i.test(img)) issues.push(["warn",`行 ${i+2}: 画像URLが http/https で始まっていません。`]);
+    if(sku){ if(skus.has(sku)) issues.push(["warn",`SKU重複: ${sku}（行 ${skus.get(sku)+2} と ${i+2}）`]); else skus.set(sku,i); }
+  });
+  const pc=countProducts();
+  if(pc>20) issues.push(["info",`Free版では ${pc} 商品中、先頭20商品まで出力します。`]);
+  state.issues=issues;
+  $("#rowCount").textContent=state.rows.length;
+  $("#productCount").textContent=pc;
+  $("#issueCount").textContent=issues.length;
+  $("#issuesCard").classList.toggle("hidden",issues.length===0);
+  $("#issues").innerHTML=issues.length?issues.slice(0,100).map(x=>`<div class="issue ${x[0]}">${escHtml(x[1])}</div>`).join(""):`<div class="notice ok">大きな問題は見つかりませんでした。</div>`;
+  $("#convertBtn").disabled=!state.rows.length || !state.mapping.title;
+}
+function shopifyRows(){
+  const out=[];
+  const allowed=[];
+  const seenProducts=new Set();
+  for(const r of state.rows){
+    let key=productKey(r) || ("row-"+allowed.length);
+    if(!seenProducts.has(key)){
+      if(seenProducts.size>=20) continue;
+      seenProducts.add(key);
+    }
+    allowed.push(r);
+  }
+  const handleSeen=new Map();
+  for(const r of allowed){
+    const title=val(r,"title");
+    let handle=slugify(val(r,"handle")||title);
+    const originalKey=productKey(r);
+    if(handleSeen.has(originalKey)) handle=handleSeen.get(originalKey); else handleSeen.set(originalKey,handle);
+    let price=val(r,"price").replace(/[,￥¥]/g,"");
+    let stock=val(r,"stock").replace(/,/g,"");
+    const sku=val(r,"sku");
+    const optName=val(r,"optionName") || (val(r,"optionValue") ? "Option" : "Title");
+    const optValue=val(r,"optionValue") || "Default Title";
+    out.push({
+      "Handle":handle,
+      "Title":title,
+      "Body (HTML)":val(r,"description"),
+      "Vendor":val(r,"vendor"),
+      "Product Category":"",
+      "Type":"",
+      "Tags":"",
+      "Published":"TRUE",
+      "Option1 Name":optName,
+      "Option1 Value":optValue,
+      "Variant SKU":sku,
+      "Variant Grams":"0",
+      "Variant Inventory Tracker":stock!==""?"shopify":"",
+      "Variant Inventory Qty":stock!==""?stock:"",
+      "Variant Inventory Policy":"deny",
+      "Variant Fulfillment Service":"manual",
+      "Variant Price":price,
+      "Variant Compare At Price":"",
+      "Variant Requires Shipping":"TRUE",
+      "Variant Taxable":"TRUE",
+      "Image Src":val(r,"image"),
+      "Image Position":"",
+      "Image Alt Text":title,
+      "Gift Card":"FALSE",
+      "SEO Title":title,
+      "SEO Description":"",
+      "Status":"active"
+    });
+  }
+  return out;
+}
+function csvEscape(v){
+  const s=String(v??"");
+  return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+function toCSV(rows){
+  if(!rows.length) return "";
+  const hs=Object.keys(rows[0]);
+  return hs.map(csvEscape).join(",")+"\r\n"+rows.map(r=>hs.map(h=>csvEscape(r[h])).join(",")).join("\r\n");
+}
+function renderPreview(){
+  state.output=shopifyRows();
+  const hs=Object.keys(state.output[0]||{});
+  const show=state.output.slice(0,30);
+  $("#preview").innerHTML=`<thead><tr>${hs.map(h=>`<th>${escHtml(h)}</th>`).join("")}</tr></thead><tbody>${show.map(r=>`<tr>${hs.map(h=>`<td>${escHtml(r[h])}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  $("#previewCard").classList.remove("hidden");
+  $("#status").className="notice ok";
+  $("#status").textContent=`変換完了: ${state.output.length} 行を生成しました。`;
+}
+function download(name,content,type="text/csv;charset=utf-8"){
+  const blob=new Blob(["\uFEFF",content],{type});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function loadFile(file){
+  try{
+    const buf=await file.arrayBuffer();
+    const {text,enc}=decodeBuffer(buf);
+    const arr=parseCSV(text);
+    if(arr.length<2) throw new Error("データ行が見つかりません。");
+    state.headers=arr[0].map(x=>String(x).trim());
+    state.rows=arr.slice(1);
+    state.mapping=autoMap(state.headers);
+    state.fileName=file.name;
+    $("#fileInfo").classList.remove("hidden");
+    $("#fileInfo").textContent=`${file.name} / ${enc} / ${state.headers.length}列`;
+    $("#mappingCard").classList.remove("hidden");
+    buildMapping(); analyze();
+    $("#status").className="notice info"; $("#status").textContent="列の対応を確認して、変換ボタンを押してください。";
+  }catch(e){
+    $("#status").className="notice bad"; $("#status").textContent="読み込みエラー: "+e.message;
+  }
+}
+$("#file").addEventListener("change",e=>e.target.files[0]&&loadFile(e.target.files[0]));
+const drop=$("#drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>e.dataTransfer.files[0]&&loadFile(e.dataTransfer.files[0]));
+$("#convertBtn").addEventListener("click",renderPreview);
+$("#downloadBtn").addEventListener("click",()=>{
+  if(!state.output.length) return;
+  const base=(state.fileName||"rakuten").replace(/\.csv$/i,"");
+  download(base+"_shopify.csv",toCSV(state.output));
+});
+$("#resetBtn").addEventListener("click",()=>location.reload());
+$("#sampleBtn").addEventListener("click",()=>{
+  const sample=[
+    ["商品管理番号","商品名","商品説明","販売価格","SKU","在庫数","商品画像URL","ショップ名"],
+    ["rakuten-001","サンプルTシャツ","<p>楽天の商品説明サンプル</p>","2980","TS-001","15","https://example.com/image1.jpg","サンプルショップ"],
+    ["rakuten-002","サンプルバッグ","<p>軽量バッグ</p>","4980","BG-002","8","https://example.com/image2.jpg","サンプルショップ"]
+  ].map(r=>r.map(csvEscape).join(",")).join("\r\n");
+  download("rakushop_sample.csv",sample);
+});
+</script>
+</body>
+</html>
