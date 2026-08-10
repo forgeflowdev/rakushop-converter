@@ -1,12 +1,7 @@
 # ForgeFlow - RakShop Converter
 
-Convert Rakuten CSV to Shopify CSV.
+Rakuten CSV → Shopify CSV converter.
 
-Website:
-https://forgeflowtools.com
+Website: https://forgeflowtools.com
 
-Status:
-Beta
-
-License:
-Private
+Status: Beta
