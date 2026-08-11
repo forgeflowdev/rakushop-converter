@@ -16,12 +16,38 @@ window.ForgeFlowConverter=(()=>{
 
   function autoMap(headers){
     const map={};
+
+    const exactPriority={
+      title:["商品名","商品名称","title","name"],
+      description:["商品説明","PC用商品説明文","スマートフォン用商品説明文","description","body"],
+      price:["販売価格","商品価格","価格","price"],
+      sku:["SKU","sku"],
+      stock:["在庫数","在庫","stock","quantity"],
+      image:["商品画像URL","画像URL","image url","image"],
+      vendor:["ショップ名","店舗名","vendor","brand"],
+      optionName:["選択肢項目名","option name"],
+      optionValue:["選択肢値","option value"],
+      handle:["商品管理番号","商品番号","商品コード","handle"]
+    };
+
+    for(const [key,candidates] of Object.entries(exactPriority)){
+      const idx=headers.findIndex(h=>candidates.some(c=>norm(h)===norm(c)));
+      if(idx>=0) map[key]=headers[idx];
+    }
+
     for(const[key,label,aliases]of fields){
+      if(map[key]) continue;
       const opts=aliases.split("|").map(norm);
       let idx=headers.findIndex(h=>opts.includes(norm(h)));
-      if(idx<0) idx=headers.findIndex(h=>opts.some(a=>norm(h).includes(a)||a.includes(norm(h))));
+      if(idx<0){
+        idx=headers.findIndex(h=>{
+          const hn=norm(h);
+          return opts.some(a=>hn.includes(a)||a.includes(hn));
+        });
+      }
       map[key]=idx>=0?headers[idx]:"";
     }
+
     return map;
   }
 
