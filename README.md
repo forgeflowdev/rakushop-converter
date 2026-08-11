@@ -29,3 +29,9 @@ Status: Beta
 - Export uses `URL handle`, `Description`, `SKU`, `Price`, `Inventory quantity`, and other current template columns when present
 - CSV column order matches Shopify official `product_template.csv`
 - Existing Rakuten parsing, validation, preview, and Free 20-product limit remain unchanged
+
+## v3.4 changes
+- Sanitize Shopify option names and values
+- Replace unsupported slash separator sequences such as `カラー / サイズ` with `カラー・サイズ`
+- Show these changes as Auto-fix messages during validation
+- Keep Shopify official 57-column export from v3.3

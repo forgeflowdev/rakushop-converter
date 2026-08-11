@@ -110,6 +110,18 @@ window.ForgeFlowConverter=(()=>{
 
       if(img && !/^https?:\/\//i.test(img)) issues.push(["warning",`行 ${rowNo}: 画像URLが http/https で始まっていません。`]);
 
+      const rawOptionName=val(r,"optionName",headers,mapping);
+      const rawOptionValue=val(r,"optionValue",headers,mapping);
+      const safeOptionName=sanitizeOptionText(rawOptionName);
+      const safeOptionValue=sanitizeOptionText(rawOptionValue);
+
+      if(rawOptionName && safeOptionName!==rawOptionName){
+        issues.push(["fixed",`行 ${rowNo}: 選択肢名「${rawOptionName}」→「${safeOptionName}」へ自動補正します。`]);
+      }
+      if(rawOptionValue && safeOptionValue!==rawOptionValue){
+        issues.push(["fixed",`行 ${rowNo}: 選択肢値「${rawOptionValue}」→「${safeOptionValue}」へ自動補正します。`]);
+      }
+
       if(sku){
         if(skuSeen.has(sku)) issues.push(["warning",`SKU重複: ${sku}（行 ${skuSeen.get(sku)} と ${rowNo}）`]);
         else skuSeen.set(sku,rowNo);
@@ -145,6 +157,15 @@ window.ForgeFlowConverter=(()=>{
     return false;
   }
 
+  function sanitizeOptionText(raw){
+    let s=String(raw??"").trim();
+    if(!s) return "";
+    // Shopify rejects certain name sequences such as " / ".
+    s=s.replace(/\s*\/\s*/g,"・");
+    s=s.replace(/\s{2,}/g," ");
+    return s.trim();
+  }
+
   function toShopifyRows(rows,headers,mapping,limit=20){
     const out=[],allowed=[],seenProducts=new Set();
     for(const r of rows){
@@ -170,8 +191,8 @@ window.ForgeFlowConverter=(()=>{
 
       const p=cleanPrice(val(r,"price",headers,mapping));
       const s=cleanStock(val(r,"stock",headers,mapping));
-      const optionName=val(r,"optionName",headers,mapping)||"Title";
-      const optionValue=val(r,"optionValue",headers,mapping)||"Default Title";
+      const optionName=sanitizeOptionText(val(r,"optionName",headers,mapping))||"Title";
+      const optionValue=sanitizeOptionText(val(r,"optionValue",headers,mapping))||"Default Title";
 
       const o=makeEmptyShopifyRow();
 
@@ -221,6 +242,6 @@ window.ForgeFlowConverter=(()=>{
   }
 
   return {
-    fields,shopifyHeaders,autoMap,analyze,toShopifyRows,csvEscape,toCSV,cleanPrice,cleanStock
+    fields,shopifyHeaders,autoMap,analyze,toShopifyRows,csvEscape,toCSV,cleanPrice,cleanStock,sanitizeOptionText
   };
 })();
