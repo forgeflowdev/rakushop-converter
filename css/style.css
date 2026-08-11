@@ -10,3 +10,9 @@ body{margin:0;font-family:Inter,"Noto Sans JP",system-ui,sans-serif;background:#
 .issueWarning{background:#fff8e8;color:#805d16;border-color:#f5e4b8}
 .issueFixed{background:#eaf8f2;color:#176a4b;border-color:#cfeee1}
 .issueInfo{background:#eef4ff;color:#274472;border-color:#d9e7ff}
+
+.previewHead{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:12px}
+.previewHead h3{margin:0}
+.previewBadge{display:inline-flex;align-items:center;justify-content:center;background:#eef2ff;color:#4f46e5;border:1px solid #dfe3ff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;white-space:nowrap}
+#reviewCard{border:2px solid #dfe3ff;background:linear-gradient(180deg,#fff,#fafaff)}
+#reviewCard .primary{font-size:14px;padding:12px 16px}

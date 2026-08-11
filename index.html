@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>楽天CSVをShopify CSVへ変換 | ForgeFlow</title>
-  <!-- ForgeFlow RakShop Converter v3.1 -->
+  <!-- ForgeFlow RakShop Converter v3.2 -->
   <meta name="description" content="楽天の商品CSVをShopify形式へかんたん変換。インストール不要、ブラウザ内処理、20商品まで無料で試せます。">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -92,7 +92,7 @@
         <aside class="card">
           <h3>変換状況</h3>
           <div id="status" class="notice info">CSVを読み込むと自動解析します。</div>
-          <div class="row" style="margin-top:14px"><button id="convertBtn" class="primary" disabled>Shopify CSVを作成</button></div>
+          
           <p class="sub">出力はExcelでも開きやすいUTF-8 BOM付きCSVです。</p>
         </aside>
       </div>
@@ -108,10 +108,27 @@
         <div id="issues"></div>
       </section>
 
+      
+      <section id="reviewCard" class="card hidden" style="margin-top:18px">
+        <h3>4. Shopify CSVを確認</h3>
+        <p class="sub">データチェックを通過しました。Shopify向けCSVのプレビューを作成して内容を確認できます。</p>
+        <div class="row" style="margin-top:14px">
+          <button id="reviewBtn" class="primary">Shopify CSVプレビューを作成</button>
+        </div>
+      </section>
+
       <section id="previewCard" class="card hidden" style="margin-top:18px">
-        <h3>4. Shopify CSVプレビュー</h3>
+        <div class="previewHead">
+          <div>
+            <h3>5. Shopify CSVプレビュー</h3>
+            <p class="sub">先頭30行まで表示します。横スクロールして内容を確認してください。</p>
+          </div>
+          <span id="previewCount" class="previewBadge">0 行</span>
+        </div>
         <div class="scroll"><table id="preview"></table></div>
-        <div class="row" style="margin-top:14px"><button id="downloadBtn" class="primary">Shopify CSVをダウンロード</button></div>
+        <div class="row" style="margin-top:14px">
+          <button id="downloadBtn" class="primary">Shopify CSVをダウンロード</button>
+        </div>
       </section>
     </div>
   </div>
