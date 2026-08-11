@@ -9,14 +9,15 @@ window.ForgeFlowConverter=(()=>{
     ["vendor","販売元 / Vendor","ショップ名|店舗名|vendor|brand"],
     ["optionName","選択肢名","選択肢項目名|option name"],
     ["optionValue","選択肢値","選択肢値|option value"],
-    ["handle","Handle元","商品管理番号|商品番号|handle|商品コード"]
+    ["handle","Handle元","商品管理番号|商品番号|商品コード|handle"]
   ];
+
+  const shopifyHeaders=["Title", "URL handle", "Description", "Vendor", "Product category", "Type", "Tags", "Published on online store", "Status", "SKU", "Barcode", "Option1 name", "Option1 value", "Option1 Linked To", "Option2 name", "Option2 value", "Option2 Linked To", "Option3 name", "Option3 value", "Option3 Linked To", "Price", "Compare-at price", "Cost per item", "Charge tax", "Tax code", "Unit price total measure", "Unit price total measure unit", "Unit price base measure", "Unit price base measure unit", "Inventory tracker", "Inventory quantity", "Continue selling when out of stock", "Weight value (grams)", "Weight unit for display", "Requires shipping", "Fulfillment service", "Product image URL", "Image position", "Image alt text", "Variant image URL", "Gift card", "SEO title", "SEO description", "Color (product.metafields.shopify.color-pattern)", "Google Shopping / Google product category", "Google Shopping / Gender", "Google Shopping / Age group", "Google Shopping / Manufacturer part number (MPN)", "Google Shopping / Ad group name", "Google Shopping / Ads labels", "Google Shopping / Condition", "Google Shopping / Custom product", "Google Shopping / Custom label 0", "Google Shopping / Custom label 1", "Google Shopping / Custom label 2", "Google Shopping / Custom label 3", "Google Shopping / Custom label 4"];
 
   const norm=s=>String(s??"").trim().toLowerCase().replace(/[\s_\-（）()【】\[\]]/g,"");
 
   function autoMap(headers){
     const map={};
-
     const exactPriority={
       title:["商品名","商品名称","title","name"],
       description:["商品説明","PC用商品説明文","スマートフォン用商品説明文","description","body"],
@@ -97,43 +98,27 @@ window.ForgeFlowConverter=(()=>{
       const rawStock=val(r,"stock",headers,mapping);
       const img=val(r,"image",headers,mapping);
 
-      if(!title){
-        issues.push(["error",`行 ${rowNo}: 商品名が空です。`]);
-      }
+      if(!title) issues.push(["error",`行 ${rowNo}: 商品名が空です。`]);
 
       const p=cleanPrice(rawPrice);
-      if(!p.valid){
-        issues.push(["error",`行 ${rowNo}: 価格「${rawPrice}」を数値として解釈できません。`]);
-      }else if(p.changed){
-        issues.push(["fixed",`行 ${rowNo}: 価格「${rawPrice}」→「${p.value}」へ自動補正します。`]);
-      }
+      if(!p.valid) issues.push(["error",`行 ${rowNo}: 価格「${rawPrice}」を数値として解釈できません。`]);
+      else if(p.changed) issues.push(["fixed",`行 ${rowNo}: 価格「${rawPrice}」→「${p.value}」へ自動補正します。`]);
 
       const s=cleanStock(rawStock);
-      if(!s.valid){
-        issues.push(["error",`行 ${rowNo}: 在庫「${rawStock}」を数値として解釈できません。`]);
-      }else if(s.changed){
-        issues.push(["fixed",`行 ${rowNo}: 在庫「${rawStock}」→「${s.value}」へ自動補正します。`]);
-      }
+      if(!s.valid) issues.push(["error",`行 ${rowNo}: 在庫「${rawStock}」を数値として解釈できません。`]);
+      else if(s.changed) issues.push(["fixed",`行 ${rowNo}: 在庫「${rawStock}」→「${s.value}」へ自動補正します。`]);
 
-      if(img && !/^https?:\/\//i.test(img)){
-        issues.push(["warning",`行 ${rowNo}: 画像URLが http/https で始まっていません。`]);
-      }
+      if(img && !/^https?:\/\//i.test(img)) issues.push(["warning",`行 ${rowNo}: 画像URLが http/https で始まっていません。`]);
 
       if(sku){
-        if(skuSeen.has(sku)){
-          issues.push(["warning",`SKU重複: ${sku}（行 ${skuSeen.get(sku)} と ${rowNo}）`]);
-        }else{
-          skuSeen.set(sku,rowNo);
-        }
+        if(skuSeen.has(sku)) issues.push(["warning",`SKU重複: ${sku}（行 ${skuSeen.get(sku)} と ${rowNo}）`]);
+        else skuSeen.set(sku,rowNo);
       }
     });
 
     const set=new Set(rows.map(r=>productKey(r,headers,mapping)).filter(Boolean));
     const productCount=set.size||rows.length;
-
-    if(productCount>20){
-      issues.push(["info",`Free版では ${productCount} 商品中、先頭20商品まで出力します。`]);
-    }
+    if(productCount>20) issues.push(["info",`Free版では ${productCount} 商品中、先頭20商品まで出力します。`]);
 
     return {issues,productCount};
   }
@@ -144,9 +129,24 @@ window.ForgeFlowConverter=(()=>{
     return x||"product-"+Math.random().toString(36).slice(2,10);
   }
 
+  function makeEmptyShopifyRow(){
+    const obj={};
+    for(const h of shopifyHeaders) obj[h]="";
+    return obj;
+  }
+
+  function assignIfPresent(obj, candidates, value){
+    for(const name of candidates){
+      if(Object.prototype.hasOwnProperty.call(obj,name)){
+        obj[name]=value;
+        return true;
+      }
+    }
+    return false;
+  }
+
   function toShopifyRows(rows,headers,mapping,limit=20){
     const out=[],allowed=[],seenProducts=new Set();
-
     for(const r of rows){
       const key=productKey(r,headers,mapping)||("row-"+allowed.length);
       if(!seenProducts.has(key)){
@@ -161,6 +161,7 @@ window.ForgeFlowConverter=(()=>{
     for(const r of allowed){
       const title=val(r,"title",headers,mapping);
       const product=productKey(r,headers,mapping);
+
       let handle=handleMap.get(product);
       if(!handle){
         handle=slugify(val(r,"handle",headers,mapping)||title);
@@ -172,26 +173,37 @@ window.ForgeFlowConverter=(()=>{
       const optionName=val(r,"optionName",headers,mapping)||"Title";
       const optionValue=val(r,"optionValue",headers,mapping)||"Default Title";
 
-      out.push({
-        "Handle":handle,
-        "Title":title,
-        "Body (HTML)":val(r,"description",headers,mapping),
-        "Vendor":val(r,"vendor",headers,mapping),
-        "Published":"TRUE",
-        "Option1 Name":optionName,
-        "Option1 Value":optionValue,
-        "Variant SKU":val(r,"sku",headers,mapping),
-        "Variant Inventory Tracker":s.value!==""?"shopify":"",
-        "Variant Inventory Qty":s.valid?s.value:"",
-        "Variant Inventory Policy":"deny",
-        "Variant Fulfillment Service":"manual",
-        "Variant Price":p.valid?p.value:"",
-        "Variant Requires Shipping":"TRUE",
-        "Variant Taxable":"TRUE",
-        "Image Src":val(r,"image",headers,mapping),
-        "Image Alt Text":title,
-        "Status":"active"
-      });
+      const o=makeEmptyShopifyRow();
+
+      assignIfPresent(o,["URL handle","Handle"],handle);
+      assignIfPresent(o,["Title"],title);
+      assignIfPresent(o,["Description","Body (HTML)"],val(r,"description",headers,mapping));
+      assignIfPresent(o,["Vendor"],val(r,"vendor",headers,mapping));
+      assignIfPresent(o,["Published on online store","Published"],"TRUE");
+
+      assignIfPresent(o,["Option1 name","Option1 Name"],optionName);
+      assignIfPresent(o,["Option1 value","Option1 Value"],optionValue);
+
+      assignIfPresent(o,["SKU","Variant SKU"],val(r,"sku",headers,mapping));
+      assignIfPresent(o,["Inventory tracker","Variant Inventory Tracker"],s.value!==""?"shopify":"");
+      assignIfPresent(o,["Inventory quantity","Variant Inventory Qty"],s.valid?s.value:"");
+      assignIfPresent(o,["Inventory policy","Variant Inventory Policy"],"deny");
+      assignIfPresent(o,["Fulfillment service","Variant Fulfillment Service"],"manual");
+      assignIfPresent(o,["Price","Variant Price"],p.valid?p.value:"");
+      assignIfPresent(o,["Requires shipping","Variant Requires Shipping"],"TRUE");
+      assignIfPresent(o,["Charge tax","Variant Taxable"],"TRUE");
+
+      assignIfPresent(o,["Product image URL","Image Src"],val(r,"image",headers,mapping));
+      assignIfPresent(o,["Image alt text","Image Alt Text"],title);
+
+      assignIfPresent(o,["Status"],"active");
+
+      // Safe defaults for columns present in current Shopify templates.
+      assignIfPresent(o,["Gift card"],"FALSE");
+      assignIfPresent(o,["Weight value (grams)","Variant Grams"],"0");
+      assignIfPresent(o,["Weight unit for display"],"g");
+
+      out.push(o);
     }
     return out;
   }
@@ -203,10 +215,12 @@ window.ForgeFlowConverter=(()=>{
 
   function toCSV(rows){
     if(!rows.length) return "";
-    const hs=Object.keys(rows[0]);
+    const hs=shopifyHeaders;
     return hs.map(csvEscape).join(",")+"\r\n"+
-      rows.map(r=>hs.map(h=>csvEscape(r[h])).join(",")).join("\r\n");
+      rows.map(r=>hs.map(h=>csvEscape(r[h]??"")).join(",")).join("\r\n");
   }
 
-  return {fields,autoMap,analyze,toShopifyRows,csvEscape,toCSV,cleanPrice,cleanStock};
+  return {
+    fields,shopifyHeaders,autoMap,analyze,toShopifyRows,csvEscape,toCSV,cleanPrice,cleanStock
+  };
 })();

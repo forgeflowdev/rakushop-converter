@@ -23,3 +23,9 @@ Status: Beta
 - Show preview row count
 - Smooth-scroll to the generated preview
 - Keep download action inside the preview card
+
+## v3.3 changes
+- Output headers now follow the uploaded Shopify official template exactly (57 columns)
+- Export uses `URL handle`, `Description`, `SKU`, `Price`, `Inventory quantity`, and other current template columns when present
+- CSV column order matches Shopify official `product_template.csv`
+- Existing Rakuten parsing, validation, preview, and Free 20-product limit remain unchanged
