@@ -35,3 +35,8 @@ Status: Beta
 - Replace unsupported slash separator sequences such as `カラー / サイズ` with `カラー・サイズ`
 - Show these changes as Auto-fix messages during validation
 - Keep Shopify official 57-column export from v3.3
+
+## v3.5 changes
+- Fixed Shopify current inventory-policy field mapping.
+- Writes `DENY` to `Continue selling when out of stock`, matching the uploaded official Shopify 57-column sample.
+- Keeps backward-compatible aliases for older Shopify CSV formats.

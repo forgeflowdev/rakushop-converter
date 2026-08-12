@@ -208,7 +208,7 @@ window.ForgeFlowConverter=(()=>{
       assignIfPresent(o,["SKU","Variant SKU"],val(r,"sku",headers,mapping));
       assignIfPresent(o,["Inventory tracker","Variant Inventory Tracker"],s.value!==""?"shopify":"");
       assignIfPresent(o,["Inventory quantity","Variant Inventory Qty"],s.valid?s.value:"");
-      assignIfPresent(o,["Inventory policy","Variant Inventory Policy"],"deny");
+      assignIfPresent(o,["Continue selling when out of stock","Inventory policy","Variant Inventory Policy"],"DENY");
       assignIfPresent(o,["Fulfillment service","Variant Fulfillment Service"],"manual");
       assignIfPresent(o,["Price","Variant Price"],p.valid?p.value:"");
       assignIfPresent(o,["Requires shipping","Variant Requires Shipping"],"TRUE");
