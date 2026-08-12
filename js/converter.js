@@ -166,6 +166,21 @@ window.ForgeFlowConverter=(()=>{
     return s.trim();
   }
 
+  function splitShopifyOptions(rawName, rawValue){
+    const name=sanitizeOptionText(rawName);
+    const value=sanitizeOptionText(rawValue);
+    if(!name && !value) return [{name:"Title",value:"Default Title"}];
+
+    const split=(x)=>String(x||"").split(/[・|｜]/).map(v=>v.trim()).filter(Boolean);
+    const names=split(name);
+    const values=split(value);
+
+    if(names.length>=2 && names.length<=3 && names.length===values.length){
+      return names.map((n,i)=>({name:n,value:values[i]}));
+    }
+    return [{name:name||"Title",value:value||"Default Title"}];
+  }
+
   function toShopifyRows(rows,headers,mapping,limit=20){
     const out=[],allowed=[],seenProducts=new Set();
     for(const r of rows){
@@ -191,8 +206,9 @@ window.ForgeFlowConverter=(()=>{
 
       const p=cleanPrice(val(r,"price",headers,mapping));
       const s=cleanStock(val(r,"stock",headers,mapping));
-      const optionName=sanitizeOptionText(val(r,"optionName",headers,mapping))||"Title";
-      const optionValue=sanitizeOptionText(val(r,"optionValue",headers,mapping))||"Default Title";
+      const options=splitShopifyOptions(val(r,"optionName",headers,mapping),val(r,"optionValue",headers,mapping));
+      const optionName=options[0]?.name||"Title";
+      const optionValue=options[0]?.value||"Default Title";
 
       const o=makeEmptyShopifyRow();
 
@@ -204,6 +220,14 @@ window.ForgeFlowConverter=(()=>{
 
       assignIfPresent(o,["Option1 name","Option1 Name"],optionName);
       assignIfPresent(o,["Option1 value","Option1 Value"],optionValue);
+      if(options[1]){
+        assignIfPresent(o,["Option2 name","Option2 Name"],options[1].name);
+        assignIfPresent(o,["Option2 value","Option2 Value"],options[1].value);
+      }
+      if(options[2]){
+        assignIfPresent(o,["Option3 name","Option3 Name"],options[2].name);
+        assignIfPresent(o,["Option3 value","Option3 Value"],options[2].value);
+      }
 
       assignIfPresent(o,["SKU","Variant SKU"],val(r,"sku",headers,mapping));
       assignIfPresent(o,["Inventory tracker","Variant Inventory Tracker"],s.value!==""?"shopify":"");

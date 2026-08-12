@@ -40,3 +40,10 @@ Status: Beta
 - Fixed Shopify current inventory-policy field mapping.
 - Writes `DENY` to `Continue selling when out of stock`, matching the uploaded official Shopify 57-column sample.
 - Keeps backward-compatible aliases for older Shopify CSV formats.
+
+## v3.6 changes
+- Shopify products default to Draft / unpublished for safer migration testing.
+- Combined Rakuten options such as `カラー・サイズ` + `ブラック・M` are split into Shopify Option1/Option2 when the part counts match.
+- Supports up to 3 split options.
+- Invalid/non-http(s) image URLs are omitted from Shopify output instead of being sent as broken media references.
+- Retains v3.5 inventory-policy compatibility.
