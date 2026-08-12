@@ -52,3 +52,8 @@ Status: Beta
 - Shopify `Published on online store` now outputs `FALSE`.
 - Shopify `Status` now outputs `draft`.
 - This fixes test imports appearing as Active / published.
+
+## v3.6.2 hotfix
+- Fixed validation summary counters.
+- Error / Warning / Auto-fix / Info counts are now recalculated directly from the displayed issue list.
+- No converter or Shopify export behavior changed.

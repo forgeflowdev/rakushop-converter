@@ -27,7 +27,12 @@ window.ForgeFlowUI=(()=>{
     $("#issuesCard").classList.remove("hidden");
 
     const counts={error:0,warning:0,fixed:0,info:0};
-    issues.forEach(x=>counts[x[0]]=(counts[x[0]]||0)+1);
+    for(const item of issues){
+      const type=item?.[0];
+      if(Object.prototype.hasOwnProperty.call(counts,type)){
+        counts[type]+=1;
+      }
+    }
 
     const summary=`<div class="issueSummary">
       <span class="pill pillError">エラー ${counts.error}</span>
@@ -38,8 +43,20 @@ window.ForgeFlowUI=(()=>{
 
     const body=issues.length
       ? issues.map(x=>{
-          const cls={error:"issueError",warning:"issueWarning",fixed:"issueFixed",info:"issueInfo"}[x[0]]||"issueInfo";
-          const label={error:"エラー",warning:"警告",fixed:"自動修正",info:"情報"}[x[0]]||"情報";
+          const cls={
+            error:"issueError",
+            warning:"issueWarning",
+            fixed:"issueFixed",
+            info:"issueInfo"
+          }[x[0]]||"issueInfo";
+
+          const label={
+            error:"エラー",
+            warning:"警告",
+            fixed:"自動修正",
+            info:"情報"
+          }[x[0]]||"情報";
+
           return `<div class="issue ${cls}"><b>${label}</b> ${esc(x[1])}</div>`;
         }).join("")
       : `<div class="notice ok">大きな問題は見つかりませんでした。</div>`;
