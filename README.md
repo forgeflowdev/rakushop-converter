@@ -47,3 +47,8 @@ Status: Beta
 - Supports up to 3 split options.
 - Invalid/non-http(s) image URLs are omitted from Shopify output instead of being sent as broken media references.
 - Retains v3.5 inventory-policy compatibility.
+
+## v3.6.1 hotfix
+- Shopify `Published on online store` now outputs `FALSE`.
+- Shopify `Status` now outputs `draft`.
+- This fixes test imports appearing as Active / published.

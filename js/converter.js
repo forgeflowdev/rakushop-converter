@@ -216,7 +216,7 @@ window.ForgeFlowConverter=(()=>{
       assignIfPresent(o,["Title"],title);
       assignIfPresent(o,["Description","Body (HTML)"],val(r,"description",headers,mapping));
       assignIfPresent(o,["Vendor"],val(r,"vendor",headers,mapping));
-      assignIfPresent(o,["Published on online store","Published"],"TRUE");
+      assignIfPresent(o,["Published on online store","Published"],"FALSE");
 
       assignIfPresent(o,["Option1 name","Option1 Name"],optionName);
       assignIfPresent(o,["Option1 value","Option1 Value"],optionValue);
@@ -241,7 +241,7 @@ window.ForgeFlowConverter=(()=>{
       assignIfPresent(o,["Product image URL","Image Src"],val(r,"image",headers,mapping));
       assignIfPresent(o,["Image alt text","Image Alt Text"],title);
 
-      assignIfPresent(o,["Status"],"active");
+      assignIfPresent(o,["Status"],"draft");
 
       // Safe defaults for columns present in current Shopify templates.
       assignIfPresent(o,["Gift card"],"FALSE");
