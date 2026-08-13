@@ -40,7 +40,14 @@ window.ForgeFlowConverter=(()=>{
     };
 
     for(const [key,candidates] of Object.entries(exactPriority)){
-      const idx=headers.findIndex(h=>candidates.some(c=>norm(h)===norm(c)));
+      // Candidate order is the priority order.
+      // Example for RMS SKU:
+      // システム連携用SKU番号 -> SKU -> SKU管理番号
+      let idx=-1;
+      for(const candidate of candidates){
+        idx=headers.findIndex(h=>norm(h)===norm(candidate));
+        if(idx>=0) break;
+      }
       if(idx>=0) map[key]=headers[idx];
     }
 

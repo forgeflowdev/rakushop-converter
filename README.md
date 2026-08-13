@@ -66,3 +66,9 @@ Status: Beta
 - Prioritizes `SKU画像パス`, with fallback to `商品画像パス1`.
 - Prioritizes `PC用商品説明文` / `スマートフォン用商品説明文`.
 - Retains Draft / unpublished safety behavior and v3.6.2 validation.
+
+## v3.7.1 - RMS SKU priority fix
+- Fixes auto-mapping priority so candidate order is actually respected.
+- Shopify SKU now prefers `システム連携用SKU番号`.
+- Falls back to `SKU`, then `SKU管理番号` when the preferred column is unavailable.
+- Keeps the v3.7 RMS Handle and multi-variation mappings unchanged.
