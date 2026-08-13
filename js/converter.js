@@ -1,15 +1,19 @@
 window.ForgeFlowConverter=(()=>{
   const fields=[
     ["title","商品名","商品名|商品名称|name|title"],
-    ["description","商品説明","商品説明|PC用商品説明文|スマートフォン用商品説明文|description|body|説明"],
+    ["description","商品説明","PC用商品説明文|スマートフォン用商品説明文|商品説明|description|body|説明"],
     ["price","販売価格","販売価格|商品価格|価格|price"],
-    ["sku","SKU","SKU|商品管理番号|商品番号|商品コード"],
+    ["sku","SKU","システム連携用SKU番号|SKU|SKU管理番号|商品番号|商品管理番号|商品コード"],
     ["stock","在庫数","在庫数|在庫|stock|quantity"],
-    ["image","画像URL","画像URL|商品画像URL|image|image url"],
+    ["image","画像URL","SKU画像パス|商品画像パス1|画像URL|商品画像URL|image|image url"],
     ["vendor","販売元 / Vendor","ショップ名|店舗名|vendor|brand"],
-    ["optionName","選択肢名","選択肢項目名|option name"],
-    ["optionValue","選択肢値","選択肢値|option value"],
-    ["handle","Handle元","商品管理番号|商品番号|商品コード|handle"]
+    ["optionName","選択肢名","バリエーション項目名1|選択肢項目名|option name"],
+    ["optionValue","選択肢値","バリエーション項目選択肢1|選択肢値|option value"],
+    ["optionName2","選択肢名2","バリエーション項目名2|option2 name"],
+    ["optionValue2","選択肢値2","バリエーション項目選択肢2|option2 value"],
+    ["optionName3","選択肢名3","バリエーション項目名3|option3 name"],
+    ["optionValue3","選択肢値3","バリエーション項目選択肢3|option3 value"],
+    ["handle","Handle元","商品管理番号（商品URL）|商品管理番号|商品番号|商品コード|handle"]
   ];
 
   const shopifyHeaders=["Title", "URL handle", "Description", "Vendor", "Product category", "Type", "Tags", "Published on online store", "Status", "SKU", "Barcode", "Option1 name", "Option1 value", "Option1 Linked To", "Option2 name", "Option2 value", "Option2 Linked To", "Option3 name", "Option3 value", "Option3 Linked To", "Price", "Compare-at price", "Cost per item", "Charge tax", "Tax code", "Unit price total measure", "Unit price total measure unit", "Unit price base measure", "Unit price base measure unit", "Inventory tracker", "Inventory quantity", "Continue selling when out of stock", "Weight value (grams)", "Weight unit for display", "Requires shipping", "Fulfillment service", "Product image URL", "Image position", "Image alt text", "Variant image URL", "Gift card", "SEO title", "SEO description", "Color (product.metafields.shopify.color-pattern)", "Google Shopping / Google product category", "Google Shopping / Gender", "Google Shopping / Age group", "Google Shopping / Manufacturer part number (MPN)", "Google Shopping / Ad group name", "Google Shopping / Ads labels", "Google Shopping / Condition", "Google Shopping / Custom product", "Google Shopping / Custom label 0", "Google Shopping / Custom label 1", "Google Shopping / Custom label 2", "Google Shopping / Custom label 3", "Google Shopping / Custom label 4"];
@@ -20,15 +24,19 @@ window.ForgeFlowConverter=(()=>{
     const map={};
     const exactPriority={
       title:["商品名","商品名称","title","name"],
-      description:["商品説明","PC用商品説明文","スマートフォン用商品説明文","description","body"],
+      description:["PC用商品説明文","スマートフォン用商品説明文","商品説明","description","body"],
       price:["販売価格","商品価格","価格","price"],
-      sku:["SKU","sku"],
+      sku:["システム連携用SKU番号","SKU","sku","SKU管理番号"],
       stock:["在庫数","在庫","stock","quantity"],
-      image:["商品画像URL","画像URL","image url","image"],
+      image:["SKU画像パス","商品画像パス1","商品画像URL","画像URL","image url","image"],
       vendor:["ショップ名","店舗名","vendor","brand"],
-      optionName:["選択肢項目名","option name"],
-      optionValue:["選択肢値","option value"],
-      handle:["商品管理番号","商品番号","商品コード","handle"]
+      optionName:["バリエーション項目名1","選択肢項目名","option name"],
+      optionValue:["バリエーション項目選択肢1","選択肢値","option value"],
+      optionName2:["バリエーション項目名2","option2 name"],
+      optionValue2:["バリエーション項目選択肢2","option2 value"],
+      optionName3:["バリエーション項目名3","option3 name"],
+      optionValue3:["バリエーション項目選択肢3","option3 value"],
+      handle:["商品管理番号（商品URL）","商品管理番号","商品番号","商品コード","handle"]
     };
 
     for(const [key,candidates] of Object.entries(exactPriority)){
@@ -166,6 +174,29 @@ window.ForgeFlowConverter=(()=>{
     return s.trim();
   }
 
+  function collectShopifyOptions(row,headers,mapping){
+    const direct=[
+      [val(row,"optionName",headers,mapping),val(row,"optionValue",headers,mapping)],
+      [val(row,"optionName2",headers,mapping),val(row,"optionValue2",headers,mapping)],
+      [val(row,"optionName3",headers,mapping),val(row,"optionValue3",headers,mapping)]
+    ].filter(([n,v])=>String(n||"").trim()||String(v||"").trim());
+
+    // RMS SKU CSV already provides separate variation columns.
+    if(direct.length>1){
+      return direct.slice(0,3).map(([n,v])=>({
+        name:sanitizeOptionText(n)||"Title",
+        value:sanitizeOptionText(v)||"Default Title"
+      }));
+    }
+
+    // Legacy/simple input may combine "カラー / サイズ" + "ブラック / M".
+    if(direct.length===1){
+      return splitShopifyOptions(direct[0][0],direct[0][1]);
+    }
+
+    return [{name:"Title",value:"Default Title"}];
+  }
+
   function splitShopifyOptions(rawName, rawValue){
     const name=sanitizeOptionText(rawName);
     const value=sanitizeOptionText(rawValue);
@@ -206,7 +237,7 @@ window.ForgeFlowConverter=(()=>{
 
       const p=cleanPrice(val(r,"price",headers,mapping));
       const s=cleanStock(val(r,"stock",headers,mapping));
-      const options=splitShopifyOptions(val(r,"optionName",headers,mapping),val(r,"optionValue",headers,mapping));
+      const options=collectShopifyOptions(r,headers,mapping);
       const optionName=options[0]?.name||"Title";
       const optionValue=options[0]?.value||"Default Title";
 

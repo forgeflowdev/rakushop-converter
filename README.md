@@ -57,3 +57,12 @@ Status: Beta
 - Fixed validation summary counters.
 - Error / Warning / Auto-fix / Info counts are now recalculated directly from the displayed issue list.
 - No converter or Shopify export behavior changed.
+
+## v3.7 - Rakuten RMS SKU compatibility
+- Prioritizes `商品管理番号（商品URL）` as Shopify Handle.
+- Prioritizes `システム連携用SKU番号` as Shopify SKU.
+- Supports RMS `バリエーション項目名1/2/3` and `バリエーション項目選択肢1/2/3`.
+- Keeps one Rakuten product grouped as one Shopify product with multiple variants.
+- Prioritizes `SKU画像パス`, with fallback to `商品画像パス1`.
+- Prioritizes `PC用商品説明文` / `スマートフォン用商品説明文`.
+- Retains Draft / unpublished safety behavior and v3.6.2 validation.
