@@ -72,3 +72,10 @@ Status: Beta
 - Shopify SKU now prefers `システム連携用SKU番号`.
 - Falls back to `SKU`, then `SKU管理番号` when the preferred column is unavailable.
 - Keeps the v3.7 RMS Handle and multi-variation mappings unchanged.
+
+## v3.7.2 - Current Shopify product CSV headers
+- Aligns generated CSV column names with Shopify's current product CSV vocabulary.
+- Uses `Title` and `URL handle`, which Shopify currently requires for variant imports.
+- Renames legacy Shopify headers such as `Body (HTML)` / `Variant SKU` / `Image Src`
+  to current equivalents such as `Description` / `SKU` / `Product image URL`.
+- Retains RMS SKU priority and multi-variation behavior from v3.7.1.

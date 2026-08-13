@@ -250,40 +250,40 @@ window.ForgeFlowConverter=(()=>{
 
       const o=makeEmptyShopifyRow();
 
-      assignIfPresent(o,["URL handle","Handle"],handle);
+      assignIfPresent(o,["URL handle","URL handle"],handle);
       assignIfPresent(o,["Title"],title);
-      assignIfPresent(o,["Description","Body (HTML)"],val(r,"description",headers,mapping));
+      assignIfPresent(o,["Description","Description"],val(r,"description",headers,mapping));
       assignIfPresent(o,["Vendor"],val(r,"vendor",headers,mapping));
-      assignIfPresent(o,["Published on online store","Published"],"FALSE");
+      assignIfPresent(o,["Published on online store","Published on online store"],"FALSE");
 
-      assignIfPresent(o,["Option1 name","Option1 Name"],optionName);
-      assignIfPresent(o,["Option1 value","Option1 Value"],optionValue);
+      assignIfPresent(o,["Option1 name","Option1 name"],optionName);
+      assignIfPresent(o,["Option1 value","Option1 value"],optionValue);
       if(options[1]){
-        assignIfPresent(o,["Option2 name","Option2 Name"],options[1].name);
-        assignIfPresent(o,["Option2 value","Option2 Value"],options[1].value);
+        assignIfPresent(o,["Option2 name","Option2 name"],options[1].name);
+        assignIfPresent(o,["Option2 value","Option2 value"],options[1].value);
       }
       if(options[2]){
-        assignIfPresent(o,["Option3 name","Option3 Name"],options[2].name);
-        assignIfPresent(o,["Option3 value","Option3 Value"],options[2].value);
+        assignIfPresent(o,["Option3 name","Option3 name"],options[2].name);
+        assignIfPresent(o,["Option3 value","Option3 value"],options[2].value);
       }
 
-      assignIfPresent(o,["SKU","Variant SKU"],val(r,"sku",headers,mapping));
-      assignIfPresent(o,["Inventory tracker","Variant Inventory Tracker"],s.value!==""?"shopify":"");
-      assignIfPresent(o,["Inventory quantity","Variant Inventory Qty"],s.valid?s.value:"");
-      assignIfPresent(o,["Continue selling when out of stock","Inventory policy","Variant Inventory Policy"],"DENY");
-      assignIfPresent(o,["Fulfillment service","Variant Fulfillment Service"],"manual");
-      assignIfPresent(o,["Price","Variant Price"],p.valid?p.value:"");
-      assignIfPresent(o,["Requires shipping","Variant Requires Shipping"],"TRUE");
-      assignIfPresent(o,["Charge tax","Variant Taxable"],"TRUE");
+      assignIfPresent(o,["SKU","SKU"],val(r,"sku",headers,mapping));
+      assignIfPresent(o,["Inventory tracker","Inventory tracker"],s.value!==""?"shopify":"");
+      assignIfPresent(o,["Inventory quantity","Inventory quantity"],s.valid?s.value:"");
+      assignIfPresent(o,["Continue selling when out of stock","Inventory policy","Continue selling when out of stock"],"DENY");
+      assignIfPresent(o,["Fulfillment service","Fulfillment service"],"manual");
+      assignIfPresent(o,["Price","Price"],p.valid?p.value:"");
+      assignIfPresent(o,["Requires shipping","Requires shipping"],"TRUE");
+      assignIfPresent(o,["Charge tax","Charge tax"],"TRUE");
 
-      assignIfPresent(o,["Product image URL","Image Src"],val(r,"image",headers,mapping));
-      assignIfPresent(o,["Image alt text","Image Alt Text"],title);
+      assignIfPresent(o,["Product image URL","Product image URL"],val(r,"image",headers,mapping));
+      assignIfPresent(o,["Image alt text","Image alt text"],title);
 
       assignIfPresent(o,["Status"],"draft");
 
       // Safe defaults for columns present in current Shopify templates.
       assignIfPresent(o,["Gift card"],"FALSE");
-      assignIfPresent(o,["Weight value (grams)","Variant Grams"],"0");
+      assignIfPresent(o,["Weight value (grams)","Weight value (grams)"],"0");
       assignIfPresent(o,["Weight unit for display"],"g");
 
       out.push(o);
