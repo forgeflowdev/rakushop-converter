@@ -112,6 +112,7 @@ window.ForgeFlowConverter=(()=>{
       const sku=val(r,"sku",headers,mapping);
       const rawStock=val(r,"stock",headers,mapping);
       const img=val(r,"image",headers,mapping);
+      const rmsImages=collectRmsImages(r,headers);
 
       if(!title) issues.push(["error",`行 ${rowNo}: 商品名が空です。`]);
 
@@ -123,7 +124,17 @@ window.ForgeFlowConverter=(()=>{
       if(!s.valid) issues.push(["error",`行 ${rowNo}: 在庫「${rawStock}」を数値として解釈できません。`]);
       else if(s.changed) issues.push(["fixed",`行 ${rowNo}: 在庫「${rawStock}」→「${s.value}」へ自動補正します。`]);
 
-      if(img && !/^https?:\/\//i.test(img)) issues.push(["warning",`行 ${rowNo}: 画像URLが http/https で始まっていません。`]);
+      if(img && !isHttpUrl(img)){
+        issues.push(["warning",`行 ${rowNo}: 画像URLが http/https で始まっていません。`]);
+      }
+
+      const seenImageWarnings=new Set();
+      for(const url of [...rmsImages.productImages,rmsImages.skuImage]){
+        if(!url || isHttpUrl(url)) continue;
+        if(seenImageWarnings.has(url)) continue;
+        seenImageWarnings.add(url);
+        issues.push(["warning",`行 ${rowNo}: 画像URL「${url}」が http/https で始まっていません。`]);
+      }
 
       const rawOptionName=val(r,"optionName",headers,mapping);
       const rawOptionValue=val(r,"optionValue",headers,mapping);
@@ -219,6 +230,37 @@ window.ForgeFlowConverter=(()=>{
     return [{name:name||"Title",value:value||"Default Title"}];
   }
 
+  function getRmsImageColumns(headers){
+    const productImageCols=headers
+      .map((h,i)=>({h,i}))
+      .filter(x=>/^商品画像パス\d+$/u.test(String(x.h).trim()))
+      .sort((a,b)=>{
+        const na=parseInt(String(a.h).match(/\d+/)?.[0]||"0",10);
+        const nb=parseInt(String(b.h).match(/\d+/)?.[0]||"0",10);
+        return na-nb;
+      });
+
+    const skuImageIdx=headers.indexOf("SKU画像パス");
+    return {productImageCols,skuImageIdx};
+  }
+
+  function collectRmsImages(row,headers){
+    const {productImageCols,skuImageIdx}=getRmsImageColumns(headers);
+
+    const productImages=[];
+    for(const col of productImageCols){
+      const v=String(row[col.i]??"").trim();
+      if(v) productImages.push(v);
+    }
+
+    const skuImage=skuImageIdx>=0?String(row[skuImageIdx]??"").trim():"";
+    return {productImages,skuImage};
+  }
+
+  function isHttpUrl(v){
+    return /^https?:\/\//i.test(String(v||"").trim());
+  }
+
   function toShopifyRows(rows,headers,mapping,limit=20){
     const out=[],allowed=[],seenProducts=new Set();
     for(const r of rows){
@@ -287,6 +329,19 @@ window.ForgeFlowConverter=(()=>{
       assignIfPresent(o,["Weight unit for display"],"g");
 
       out.push(o);
+
+      // Shopify supports additional product images as separate rows sharing the same handle.
+      // Keep variant fields blank on these image-only rows.
+      if(validProductImages.length>1){
+        for(let imgIndex=1; imgIndex<validProductImages.length; imgIndex++){
+          const imgRow=makeEmptyShopifyRow();
+          assignIfPresent(imgRow,["URL handle","Handle"],handle);
+          assignIfPresent(imgRow,["Product image URL","Image Src"],validProductImages[imgIndex]);
+          assignIfPresent(imgRow,["Image position"],String(imgIndex+1));
+          assignIfPresent(imgRow,["Image alt text","Image Alt Text"],title);
+          out.push(imgRow);
+        }
+      }
     }
     return out;
   }

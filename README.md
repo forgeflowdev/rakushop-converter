@@ -79,3 +79,11 @@ Status: Beta
 - Renames legacy Shopify headers such as `Body (HTML)` / `Variant SKU` / `Image Src`
   to current equivalents such as `Description` / `SKU` / `Product image URL`.
 - Retains RMS SKU priority and multi-variation behavior from v3.7.1.
+
+## v3.7.3 - Multiple product images + SKU images
+- Detects RMS `商品画像パス1`, `商品画像パス2`, `商品画像パス3` and higher numbered image columns.
+- Outputs extra Shopify image-only rows for product images after the first image.
+- Maps `SKU画像パス` to Shopify `Variant image URL`.
+- Validates all RMS product/SKU image URLs and warns on non-http(s) values.
+- Image-less products remain valid.
+- Keeps RMS SKU / Handle / multi-variation behavior from v3.7.2.
