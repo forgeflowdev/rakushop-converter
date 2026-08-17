@@ -87,3 +87,10 @@ Status: Beta
 - Validates all RMS product/SKU image URLs and warns on non-http(s) values.
 - Image-less products remain valid.
 - Keeps RMS SKU / Handle / multi-variation behavior from v3.7.2.
+
+## v3.7.4 - Preview crash fix for multiple images
+- Rebuilt `toShopifyRows()` to avoid undefined `validProductImages` references.
+- Keeps first valid product image on the variant row.
+- Adds product image 2+ as Shopify image-only rows once per product.
+- Maps `SKU画像パス` to `Variant image URL`.
+- Keeps invalid-image warnings, Draft status, RMS SKU priority, and multi-variation mapping.

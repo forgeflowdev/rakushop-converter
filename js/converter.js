@@ -263,6 +263,7 @@ window.ForgeFlowConverter=(()=>{
 
   function toShopifyRows(rows,headers,mapping,limit=20){
     const out=[],allowed=[],seenProducts=new Set();
+
     for(const r of rows){
       const key=productKey(r,headers,mapping)||("row-"+allowed.length);
       if(!seenProducts.has(key)){
@@ -273,6 +274,7 @@ window.ForgeFlowConverter=(()=>{
     }
 
     const handleMap=new Map();
+    const productImageRowsAdded=new Set();
 
     for(const r of allowed){
       const title=val(r,"title",headers,mapping);
@@ -285,64 +287,84 @@ window.ForgeFlowConverter=(()=>{
       }
 
       const p=cleanPrice(val(r,"price",headers,mapping));
-      const s=cleanStock(val(r,"stock",headers,mapping));
+      const sQty=cleanStock(val(r,"stock",headers,mapping));
       const options=collectShopifyOptions(r,headers,mapping);
+
       const optionName=options[0]?.name||"Title";
       const optionValue=options[0]?.value||"Default Title";
 
+      const rmsImages=collectRmsImages(r,headers);
+      const mappedImage=val(r,"image",headers,mapping);
+      const validProductImages=rmsImages.productImages.filter(isHttpUrl);
+      const validSkuImage=isHttpUrl(rmsImages.skuImage)?String(rmsImages.skuImage).trim():"";
+      const fallbackMappedImage=isHttpUrl(mappedImage)?String(mappedImage).trim():"";
+
+      // For product image #1: product image wins, then mapped image, then SKU image.
+      const primaryImage=validProductImages[0] || fallbackMappedImage || validSkuImage;
+
       const o=makeEmptyShopifyRow();
 
-      assignIfPresent(o,["URL handle","URL handle"],handle);
+      assignIfPresent(o,["URL handle","Handle"],handle);
       assignIfPresent(o,["Title"],title);
-      assignIfPresent(o,["Description","Description"],val(r,"description",headers,mapping));
+      assignIfPresent(o,["Description","Body (HTML)"],val(r,"description",headers,mapping));
       assignIfPresent(o,["Vendor"],val(r,"vendor",headers,mapping));
-      assignIfPresent(o,["Published on online store","Published on online store"],"FALSE");
-
-      assignIfPresent(o,["Option1 name","Option1 name"],optionName);
-      assignIfPresent(o,["Option1 value","Option1 value"],optionValue);
-      if(options[1]){
-        assignIfPresent(o,["Option2 name","Option2 name"],options[1].name);
-        assignIfPresent(o,["Option2 value","Option2 value"],options[1].value);
-      }
-      if(options[2]){
-        assignIfPresent(o,["Option3 name","Option3 name"],options[2].name);
-        assignIfPresent(o,["Option3 value","Option3 value"],options[2].value);
-      }
-
-      assignIfPresent(o,["SKU","SKU"],val(r,"sku",headers,mapping));
-      assignIfPresent(o,["Inventory tracker","Inventory tracker"],s.value!==""?"shopify":"");
-      assignIfPresent(o,["Inventory quantity","Inventory quantity"],s.valid?s.value:"");
-      assignIfPresent(o,["Continue selling when out of stock","Inventory policy","Continue selling when out of stock"],"DENY");
-      assignIfPresent(o,["Fulfillment service","Fulfillment service"],"manual");
-      assignIfPresent(o,["Price","Price"],p.valid?p.value:"");
-      assignIfPresent(o,["Requires shipping","Requires shipping"],"TRUE");
-      assignIfPresent(o,["Charge tax","Charge tax"],"TRUE");
-
-      assignIfPresent(o,["Product image URL","Product image URL"],val(r,"image",headers,mapping));
-      assignIfPresent(o,["Image alt text","Image alt text"],title);
-
+      assignIfPresent(o,["Published on online store","Published"],"FALSE");
       assignIfPresent(o,["Status"],"draft");
 
-      // Safe defaults for columns present in current Shopify templates.
+      assignIfPresent(o,["Option1 name","Option1 Name"],optionName);
+      assignIfPresent(o,["Option1 value","Option1 Value"],optionValue);
+
+      if(options[1]){
+        assignIfPresent(o,["Option2 name","Option2 Name"],options[1].name);
+        assignIfPresent(o,["Option2 value","Option2 Value"],options[1].value);
+      }
+      if(options[2]){
+        assignIfPresent(o,["Option3 name","Option3 Name"],options[2].name);
+        assignIfPresent(o,["Option3 value","Option3 Value"],options[2].value);
+      }
+
+      assignIfPresent(o,["SKU","Variant SKU"],val(r,"sku",headers,mapping));
+      assignIfPresent(o,["Inventory tracker","Variant Inventory Tracker"],sQty.value!==""?"shopify":"");
+      assignIfPresent(o,["Inventory quantity","Variant Inventory Qty"],sQty.valid?sQty.value:"");
+      assignIfPresent(o,["Continue selling when out of stock","Inventory policy","Variant Inventory Policy"],"DENY");
+      assignIfPresent(o,["Fulfillment service","Variant Fulfillment Service"],"manual");
+      assignIfPresent(o,["Price","Variant Price"],p.valid?p.value:"");
+      assignIfPresent(o,["Requires shipping","Variant Requires Shipping"],"TRUE");
+      assignIfPresent(o,["Charge tax","Variant Taxable"],"TRUE");
+
+      if(primaryImage){
+        assignIfPresent(o,["Product image URL","Image Src"],primaryImage);
+        assignIfPresent(o,["Image position"],"1");
+        assignIfPresent(o,["Image alt text","Image Alt Text"],title);
+      }
+
+      if(validSkuImage){
+        assignIfPresent(o,["Variant image URL","Variant Image"],validSkuImage);
+      }
+
       assignIfPresent(o,["Gift card"],"FALSE");
-      assignIfPresent(o,["Weight value (grams)","Weight value (grams)"],"0");
+      assignIfPresent(o,["Weight value (grams)","Variant Grams"],"0");
       assignIfPresent(o,["Weight unit for display"],"g");
 
       out.push(o);
 
-      // Shopify supports additional product images as separate rows sharing the same handle.
-      // Keep variant fields blank on these image-only rows.
-      if(validProductImages.length>1){
-        for(let imgIndex=1; imgIndex<validProductImages.length; imgIndex++){
+      // Add extra product image rows only once per product.
+      // Additional rows share the same handle but leave variant fields empty.
+      if(!productImageRowsAdded.has(handle)){
+        productImageRowsAdded.add(handle);
+
+        const extraImages = validProductImages.slice(1);
+        extraImages.forEach((url,idx)=>{
           const imgRow=makeEmptyShopifyRow();
           assignIfPresent(imgRow,["URL handle","Handle"],handle);
-          assignIfPresent(imgRow,["Product image URL","Image Src"],validProductImages[imgIndex]);
-          assignIfPresent(imgRow,["Image position"],String(imgIndex+1));
+          assignIfPresent(imgRow,["Product image URL","Image Src"],url);
+          assignIfPresent(imgRow,["Image position"],String(idx+2));
           assignIfPresent(imgRow,["Image alt text","Image Alt Text"],title);
           out.push(imgRow);
-        }
+        });
       }
     }
+
     return out;
   }
 
