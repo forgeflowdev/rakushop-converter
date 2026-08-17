@@ -93,7 +93,7 @@
       return;
     }
 
-    state.output=C.toShopifyRows(state.rows,state.headers,state.mapping,20);
+    state.output=C.toShopifyRows(state.rows,state.headers,state.mapping,1000);
 
     U.renderPreview(state.output);
     $("#previewCount").textContent=`${state.output.length} 行`;

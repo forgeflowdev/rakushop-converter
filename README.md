@@ -101,3 +101,8 @@ Status: Beta
 - Intended to validate 100 products / 250+ SKU imports in Shopify Dev Store.
 - Do not use this build as the public Free version.
 - All v3.7.4 RMS, image, HTML, Draft, and Shopify compatibility behavior remains unchanged.
+
+## v3.7.5 TEST2
+- Fixes the remaining hard-coded 20-product export limit in `js/app.js`.
+- Stress-test export ceiling remains 1,000 products.
+- Expected result for `rakuten-rms-bulk-100-products.csv`: 100 products / 250 SKU rows before any image-only rows.
