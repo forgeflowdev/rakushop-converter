@@ -94,3 +94,10 @@ Status: Beta
 - Adds product image 2+ as Shopify image-only rows once per product.
 - Maps `SKU画像パス` to `Variant image URL`.
 - Keeps invalid-image warnings, Draft status, RMS SKU priority, and multi-variation mapping.
+
+## v3.7.5 TEST - Large catalog stress test
+- TEST BUILD ONLY: temporarily disables the Free 20-product export limit.
+- Raises export ceiling to 1,000 products for load testing.
+- Intended to validate 100 products / 250+ SKU imports in Shopify Dev Store.
+- Do not use this build as the public Free version.
+- All v3.7.4 RMS, image, HTML, Draft, and Shopify compatibility behavior remains unchanged.

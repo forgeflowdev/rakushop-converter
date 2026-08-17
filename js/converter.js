@@ -156,7 +156,7 @@ window.ForgeFlowConverter=(()=>{
 
     const set=new Set(rows.map(r=>productKey(r,headers,mapping)).filter(Boolean));
     const productCount=set.size||rows.length;
-    if(productCount>20) issues.push(["info",`Free版では ${productCount} 商品中、先頭20商品まで出力します。`]);
+    // TEST build: product export limit disabled.
 
     return {issues,productCount};
   }
@@ -261,7 +261,7 @@ window.ForgeFlowConverter=(()=>{
     return /^https?:\/\//i.test(String(v||"").trim());
   }
 
-  function toShopifyRows(rows,headers,mapping,limit=20){
+  function toShopifyRows(rows,headers,mapping,limit=1000){
     const out=[],allowed=[],seenProducts=new Set();
 
     for(const r of rows){
