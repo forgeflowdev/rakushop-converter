@@ -154,6 +154,32 @@ window.ForgeFlowConverter=(()=>{
       }
     });
 
+    // v3.7.6 TEST: additional abnormal-data checks
+    const col=(name)=>headers.indexOf(name);
+    const hi=col("商品管理番号（商品URL）"), ti=col("商品名"), si=col("在庫数");
+    const o1ni=col("バリエーション項目名1"), o1vi=col("バリエーション項目選択肢1");
+    const o2ni=col("バリエーション項目名2"), o2vi=col("バリエーション項目選択肢2");
+    const seenHandleTitle=new Map();
+    rows.forEach((r,i)=>{
+      const rowNo=i+2, get=(x)=>x>=0?String(r[x]??"").trim():"";
+      const handle=get(hi), title=get(ti), stock=get(si);
+      if(hi>=0 && !handle) issues.push(["error",`行 ${rowNo}: 商品管理番号（商品URL）が空です。`]);
+      if(si>=0 && /^-\d+(?:\.\d+)?$/.test(stock))
+        issues.push(["error",`行 ${rowNo}: 在庫「${stock}」はマイナス値です。0以上の数値にしてください。`]);
+      [[o1ni,o1vi],[o2ni,o2vi]].forEach(([ni,vi])=>{
+        const n=get(ni), v=get(vi);
+        if(n && !v) issues.push(["error",`行 ${rowNo}: 選択肢名「${n}」に対する選択肢値が空です。`]);
+      });
+      if(handle && title){
+        if(!seenHandleTitle.has(handle)) seenHandleTitle.set(handle,{title,rowNo});
+        else {
+          const first=seenHandleTitle.get(handle);
+          if(first.title!==title) issues.push(["warning",
+            `同一商品管理番号「${handle}」で商品名が一致しません（行 ${first.rowNo}:「${first.title}」 / 行 ${rowNo}:「${title}」）。`]);
+        }
+      }
+    });
+
     const set=new Set(rows.map(r=>productKey(r,headers,mapping)).filter(Boolean));
     const productCount=set.size||rows.length;
     // TEST build: product export limit disabled.
