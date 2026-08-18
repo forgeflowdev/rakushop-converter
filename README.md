@@ -106,3 +106,10 @@ Status: Beta
 - Fixes the remaining hard-coded 20-product export limit in `js/app.js`.
 - Stress-test export ceiling remains 1,000 products.
 - Expected result for `rakuten-rms-bulk-100-products.csv`: 100 products / 250 SKU rows before any image-only rows.
+
+## v3.7.7 TEST
+Additional boundary-value warnings:
+- Price = 0 => Warning
+- Blank inventory => Warning
+- Keeps all v3.7.6 abnormal-data checks.
+- Keeps the TEST export ceiling of 1,000 products.

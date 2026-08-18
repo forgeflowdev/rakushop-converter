@@ -180,6 +180,27 @@ window.ForgeFlowConverter=(()=>{
       }
     });
 
+    // v3.7.7 TEST: boundary-value warnings
+    const ffPriceIdx = headers.indexOf("販売価格");
+    const ffStockIdx2 = headers.indexOf("在庫数");
+
+    rows.forEach((r,i)=>{
+      const rowNo=i+2;
+      const priceRaw=ffPriceIdx>=0?String(r[ffPriceIdx]??"").trim():"";
+      const stockRaw=ffStockIdx2>=0?String(r[ffStockIdx2]??"").trim():"";
+
+      if(ffPriceIdx>=0){
+        const normalizedPrice=priceRaw.replace(/[￥¥円,\s]/g,"");
+        if(normalizedPrice==="0" || normalizedPrice==="0.0" || normalizedPrice==="0.00"){
+          issues.push(["warning",`行 ${rowNo}: 価格が0です。意図した無料商品か確認してください。`]);
+        }
+      }
+
+      if(ffStockIdx2>=0 && stockRaw===""){
+        issues.push(["warning",`行 ${rowNo}: 在庫数が空欄です。Shopify側で在庫設定を確認してください。`]);
+      }
+    });
+
     const set=new Set(rows.map(r=>productKey(r,headers,mapping)).filter(Boolean));
     const productCount=set.size||rows.length;
     // TEST build: product export limit disabled.
