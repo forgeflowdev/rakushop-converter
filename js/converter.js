@@ -180,7 +180,7 @@ window.ForgeFlowConverter=(()=>{
       }
     });
 
-    // v3.7.7 TEST: boundary-value warnings
+    // v3.8.0: boundary-value warnings
     const ffPriceIdx = headers.indexOf("販売価格");
     const ffStockIdx2 = headers.indexOf("在庫数");
 
@@ -203,7 +203,6 @@ window.ForgeFlowConverter=(()=>{
 
     const set=new Set(rows.map(r=>productKey(r,headers,mapping)).filter(Boolean));
     const productCount=set.size||rows.length;
-    // TEST build: product export limit disabled.
 
     return {issues,productCount};
   }
@@ -308,7 +307,7 @@ window.ForgeFlowConverter=(()=>{
     return /^https?:\/\//i.test(String(v||"").trim());
   }
 
-  function toShopifyRows(rows,headers,mapping,limit=1000){
+  function toShopifyRows(rows,headers,mapping,limit=100){
     const out=[],allowed=[],seenProducts=new Set();
 
     for(const r of rows){

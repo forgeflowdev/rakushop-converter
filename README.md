@@ -113,3 +113,12 @@ Additional boundary-value warnings:
 - Blank inventory => Warning
 - Keeps all v3.7.6 abnormal-data checks.
 - Keeps the TEST export ceiling of 1,000 products.
+
+
+## v3.8.0 - Sales preparation
+- Restores the public Free export limit at 100 products.
+- Updates public-facing TEST wording to the Free plan.
+- Adds Standard plan presentation: JPY 2,980 / 30 days / up to 1,000 products.
+- Standard purchase remains disabled while payment-provider review is pending.
+- Shows a Free-limit notice when a catalog contains more than 100 products.
+- Payment and license activation are not implemented in this build.

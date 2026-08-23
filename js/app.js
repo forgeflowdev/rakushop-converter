@@ -93,12 +93,15 @@
       return;
     }
 
-    state.output=C.toShopifyRows(state.rows,state.headers,state.mapping,1000);
+    state.output=C.toShopifyRows(state.rows,state.headers,state.mapping,100);
 
     U.renderPreview(state.output);
     $("#previewCount").textContent=`${state.output.length} 行`;
     $("#status").className="notice ok";
-    $("#status").textContent=`Shopify CSVプレビューを作成しました（${state.output.length} 行）。`;
+    const freeLimitReached=state.lastAnalysis.productCount>100;
+    $("#status").textContent=freeLimitReached
+      ? `Free版では先頭100商品を出力しています（読み込み: ${state.lastAnalysis.productCount}商品）。Standardは最大1,000商品に対応予定です。`
+      : `Shopify CSVプレビューを作成しました（${state.output.length} 行）。`;
 
     setTimeout(()=>{
       $("#previewCard").scrollIntoView({behavior:"smooth",block:"start"});
