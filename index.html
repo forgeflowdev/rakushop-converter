@@ -155,6 +155,35 @@
   </div>
 </section>
 
+
+<section id="licenseCard" class="card license-card">
+  <div class="license-head">
+    <div>
+      <span class="eyebrow">STANDARD</span>
+      <h3>ライセンス認証</h3>
+      <p class="sub">Standard購入後に発行されるライセンスキーを入力すると、最大1,000商品まで変換できます。</p>
+    </div>
+    <span id="planBadge" class="plan-badge free">Free</span>
+  </div>
+
+  <div id="licenseFreeState">
+    <div class="license-row">
+      <input id="licenseKeyInput" type="text" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX">
+      <button id="activateLicenseBtn" class="primary" type="button">ライセンスを認証</button>
+    </div>
+    <p id="licenseMessage" class="license-message">現在はFreeプラン（最大20商品）です。</p>
+    <button id="buyStandardBtn" class="secondary" type="button" disabled>Standard ¥2,980（準備中）</button>
+  </div>
+
+  <div id="licenseStandardState" class="hidden">
+    <div class="notice ok">
+      Standardが有効です。最大1,000商品まで変換できます。
+      <span id="licenseExpiryText"></span>
+    </div>
+    <button id="deactivateLicenseBtn" class="secondary" type="button">この端末の認証を解除</button>
+  </div>
+</section>
+
 <footer>
   <div class="container footerGrid">
     <div><div class="logo"><span class="logoMark">FF</span><span>ForgeFlow</span></div><div class="small">EC・データ変換・業務効率化ツールを開発しています。</div></div>
@@ -165,6 +194,7 @@
 <script src="js/parser.js"></script>
 <script src="js/converter.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/license.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

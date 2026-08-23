@@ -128,3 +128,15 @@ Additional boundary-value warnings:
 - Free export limit changed from 100 products to 20 products.
 - Updated landing page, pricing copy, metadata, and converter notices to 20 products.
 - Standard remains planned at up to 1,000 products / 30 days / ¥2,980.
+
+## v3.8.2 LICENSE PREP
+- Free plan remains 20 products.
+- Adds Standard license UI and plan badge.
+- Adds local verified-license state with 30-day expiry support.
+- Export ceiling automatically switches:
+  - Free: 20 products
+  - Standard: 1,000 products
+- License activation endpoint is intentionally NOT connected yet.
+- After Lemon Squeezy approval, set `window.FORGEFLOW_LICENSE_API_BASE`
+  to a Cloudflare Worker endpoint that verifies Lemon Squeezy licenses server-side.
+- No secret keys are stored in the browser.

@@ -93,7 +93,7 @@
       return;
     }
 
-    state.output=C.toShopifyRows(state.rows,state.headers,state.mapping,20);
+    state.output=C.toShopifyRows(state.rows,state.headers,state.mapping,ForgeFlowLicense.getState().limit);
 
     U.renderPreview(state.output);
     $("#previewCount").textContent=`${state.output.length} 行`;
@@ -152,4 +152,62 @@
 
     U.download("rakushop_sample.csv",s);
   });
+
+  // ---------- License UI ----------
+  function renderLicenseState(){
+    const state=ForgeFlowLicense.getState();
+    const badge=document.querySelector("#planBadge");
+    const freeBox=document.querySelector("#licenseFreeState");
+    const stdBox=document.querySelector("#licenseStandardState");
+    const expiry=document.querySelector("#licenseExpiryText");
+
+    if(!badge || !freeBox || !stdBox) return;
+
+    if(state.plan==="standard"){
+      badge.textContent="Standard";
+      badge.className="plan-badge standard";
+      freeBox.classList.add("hidden");
+      stdBox.classList.remove("hidden");
+      if(expiry && state.license?.expiresAt){
+        const d=new Date(state.license.expiresAt);
+        expiry.textContent=`（有効期限: ${d.toLocaleDateString("ja-JP")}）`;
+      }
+    }else{
+      badge.textContent="Free";
+      badge.className="plan-badge free";
+      freeBox.classList.remove("hidden");
+      stdBox.classList.add("hidden");
+    }
+  }
+
+  const activateBtn=document.querySelector("#activateLicenseBtn");
+  if(activateBtn){
+    activateBtn.addEventListener("click",async()=>{
+      const input=document.querySelector("#licenseKeyInput");
+      const msg=document.querySelector("#licenseMessage");
+      activateBtn.disabled=true;
+      if(msg) msg.textContent="ライセンスを確認しています...";
+      try{
+        await ForgeFlowLicense.activate(input?.value||"");
+        if(msg) msg.textContent="Standardを有効化しました。";
+        renderLicenseState();
+      }catch(e){
+        if(msg) msg.textContent=e.message;
+      }finally{
+        activateBtn.disabled=false;
+      }
+    });
+  }
+
+  const deactivateBtn=document.querySelector("#deactivateLicenseBtn");
+  if(deactivateBtn){
+    deactivateBtn.addEventListener("click",()=>{
+      ForgeFlowLicense.clear();
+      renderLicenseState();
+      location.reload();
+    });
+  }
+
+  renderLicenseState();
+
 })();
