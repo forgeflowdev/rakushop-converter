@@ -122,3 +122,9 @@ Additional boundary-value warnings:
 - Standard purchase remains disabled while payment-provider review is pending.
 - Shows a Free-limit notice when a catalog contains more than 100 products.
 - Payment and license activation are not implemented in this build.
+
+
+## v3.8.1 — Free 20 product limit
+- Free export limit changed from 100 products to 20 products.
+- Updated landing page, pricing copy, metadata, and converter notices to 20 products.
+- Standard remains planned at up to 1,000 products / 30 days / ¥2,980.

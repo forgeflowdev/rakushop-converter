@@ -307,7 +307,7 @@ window.ForgeFlowConverter=(()=>{
     return /^https?:\/\//i.test(String(v||"").trim());
   }
 
-  function toShopifyRows(rows,headers,mapping,limit=100){
+  function toShopifyRows(rows,headers,mapping,limit=20){
     const out=[],allowed=[],seenProducts=new Set();
 
     for(const r of rows){
