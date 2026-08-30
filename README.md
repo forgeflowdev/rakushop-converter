@@ -1,4 +1,4 @@
-ForgeFlow v3.8.5 TEST WORKER CONNECTED
+ForgeFlow v3.8.6 LICENSE STATE SYNC FIX
 
 # ForgeFlow - RakShop Converter
 
@@ -161,3 +161,9 @@ Additional boundary-value warnings:
 4. Set the deployed Worker URL as `FORGEFLOW_LICENSE_API_BASE` in `js/config.js`.
 5. Upload this build, purchase in Test mode, then activate with the receipt email and test license key.
 6. Before production, repeat the IDs/checkout URL using Live mode values.
+
+
+## v3.8.6 - License state sync fix
+- If a license activation is manually deactivated in Lemon Squeezy, the next validation now clears stale local Standard state and returns ForgeFlow to Free.
+- The in-app "この端末の認証を解除" action now also succeeds locally when Lemon Squeezy reports that the instance is already missing/deactivated.
+- Temporary network or 5xx server failures still keep the local activation so users can retry without losing the instance reference.

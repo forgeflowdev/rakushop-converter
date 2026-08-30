@@ -50,7 +50,10 @@ window.ForgeFlowLicense=(()=>{
     let data={};
     try{ data=await res.json(); }catch(e){}
     if(!res.ok || data.ok===false){
-      throw new Error(data.error||data.message||"ライセンス認証に失敗しました。");
+      const err=new Error(data.error||data.message||"ライセンス認証に失敗しました。");
+      err.status=res.status;
+      err.responseData=data;
+      throw err;
     }
     return data;
   }
@@ -93,7 +96,12 @@ window.ForgeFlowLicense=(()=>{
       localStorage.setItem(STORAGE_KEY,JSON.stringify(current));
       return getState();
     }catch(e){
-      // Keep a previously verified license during a temporary network failure.
+      // A definitive 4xx response means the saved server-side activation is no longer valid.
+      // Clear local Standard state so manual deactivation in Lemon Squeezy is reflected on reload.
+      if(Number(e && e.status)>=400 && Number(e && e.status)<500){
+        return clearLocal();
+      }
+      // Keep a previously verified license only during temporary network/server failures.
       return getState();
     }
   }
@@ -101,12 +109,21 @@ window.ForgeFlowLicense=(()=>{
   async function deactivate(){
     const current=parseStored();
     if(!current) return clearLocal();
-    await post({
-      action:"deactivate",
-      license_key:current.licenseKey,
-      instance_id:current.instanceId
-    });
-    return clearLocal();
+    try{
+      await post({
+        action:"deactivate",
+        license_key:current.licenseKey,
+        instance_id:current.instanceId
+      });
+      return clearLocal();
+    }catch(e){
+      // If Lemon Squeezy says the instance is already gone/invalid, local cleanup should still succeed.
+      if(Number(e && e.status)>=400 && Number(e && e.status)<500){
+        return clearLocal();
+      }
+      // For temporary server/network failures, keep the local activation so the user can retry later.
+      throw e;
+    }
   }
 
   return {FREE_LIMIT,STANDARD_LIMIT,getState,activate,validate,deactivate,clearLocal};
