@@ -1,4 +1,4 @@
-ForgeFlow v3.8.8 LEGAL PAGES UPDATE
+ForgeFlow v3.8.9 LEMON MOR ALIGNMENT
 
 # ForgeFlow - RakShop Converter
 
@@ -7,6 +7,13 @@ Rakuten CSV → Shopify CSV converter.
 Website: https://forgeflowtools.com
 
 Status: Beta
+
+## v3.8.9 - Lemon Squeezy Merchant of Record alignment
+- Clarified that Lemon Squeezy processes Standard purchases as Merchant of Record.
+- Clarified ForgeFlow's role as the product/Supplier and license provider.
+- Aligned refund wording with Lemon Squeezy's Merchant of Record and refund/chargeback process.
+- Added a concise payment/MoR notice below the pricing cards.
+- No converter logic, license API, checkout URL, or plan-limit behavior changed.
 
 ## v3.8.8 - Legal pages update
 - Expanded Terms of Service for Free/Standard plan terms, license conditions, payments, refunds, prohibited use, disclaimers, and service changes.
