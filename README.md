@@ -1,4 +1,4 @@
-ForgeFlow v3.8.7 LIVE CHECKOUT
+ForgeFlow v3.8.8 LEGAL PAGES UPDATE
 
 # ForgeFlow - RakShop Converter
 
@@ -7,6 +7,11 @@ Rakuten CSV → Shopify CSV converter.
 Website: https://forgeflowtools.com
 
 Status: Beta
+
+## v3.8.8 - Legal pages update
+- Expanded Terms of Service for Free/Standard plan terms, license conditions, payments, refunds, prohibited use, disclaimers, and service changes.
+- Expanded Privacy Policy to accurately describe browser-only CSV processing, license activation data, localStorage, Cloudflare Worker, and Lemon Squeezy checkout.
+- No converter, license API, checkout URL, or plan-limit behavior changed.
 
 ## v3 changes
 - Correct variant handling
