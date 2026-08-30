@@ -1,3 +1,5 @@
+ForgeFlow v3.8.5 TEST WORKER CONNECTED
+
 # ForgeFlow - RakShop Converter
 
 Rakuten CSV → Shopify CSV converter.
@@ -140,3 +142,22 @@ Additional boundary-value warnings:
 - After Lemon Squeezy approval, set `window.FORGEFLOW_LICENSE_API_BASE`
   to a Cloudflare Worker endpoint that verifies Lemon Squeezy licenses server-side.
 - No secret keys are stored in the browser.
+
+## v3.8.3 - Lemon Squeezy lifetime license integration prep
+- Standard is now ¥2,980 one-time purchase / no recurring fee.
+- Removes the old 30-day expiry UI and local expiry requirement.
+- Adds purchase buttons driven by `window.FORGEFLOW_CHECKOUT_URL`.
+- License activation asks for the purchase email + license key.
+- Stores Lemon Squeezy `instance_id` locally after activation.
+- Validates the stored instance on later visits.
+- Deactivation now calls Lemon Squeezy before clearing local state, so the 1-activation slot is released correctly.
+- Adds a Cloudflare Worker proxy in `/worker`.
+- Worker verifies the Lemon Squeezy product ID (and optionally variant/store ID) and customer email before granting Standard.
+
+### Remaining setup before end-to-end testing
+1. Copy the Lemon Squeezy TEST checkout/share URL and set `FORGEFLOW_CHECKOUT_URL` in `js/config.js`.
+2. Copy the Lemon Squeezy TEST product ID and set `EXPECTED_PRODUCT_ID` in the Worker environment.
+3. Deploy `/worker/worker.js` to Cloudflare Workers and set `ALLOWED_ORIGIN` to your ForgeFlow domain.
+4. Set the deployed Worker URL as `FORGEFLOW_LICENSE_API_BASE` in `js/config.js`.
+5. Upload this build, purchase in Test mode, then activate with the receipt email and test license key.
+6. Before production, repeat the IDs/checkout URL using Live mode values.

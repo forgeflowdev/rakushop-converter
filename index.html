@@ -139,7 +139,7 @@
     <div class="center"><h2>料金</h2><p class="lead">まずは無料で変換精度をお試しいただけます。Standardなら最大1,000商品まで一括変換できます。</p></div>
     <div class="pricing">
       <div class="priceCard"><h3>Free</h3><div class="price">¥0</div><div class="priceNote">期限なし</div><ul class="checks"><li>✓ 最大20商品まで</li><li>✓ CSV自動判定</li><li>✓ データチェック</li><li>✓ Shopify CSV出力</li></ul><a class="btn btnSecondary" href="#converter">無料で試す</a></div>
-      <div class="priceCard reco"><span class="ribbon">準備中</span><h3>Standard</h3><div class="price">¥2,980</div><div class="priceNote">30日間</div><ul class="checks"><li>✓ 最大1,000商品まで</li><li>✓ CSV自動判定</li><li>✓ データチェック</li><li>✓ Shopify CSV出力</li></ul><button class="upgradeBtn" type="button" disabled>現在準備中</button></div>
+      <div class="priceCard reco"><span class="ribbon">おすすめ</span><h3>Standard</h3><div class="price">¥2,980</div><div class="priceNote">買い切り・追加料金なし</div><ul class="checks"><li>✓ 1回につき最大1,000商品まで</li><li>✓ CSV自動判定</li><li>✓ データチェック</li><li>✓ Shopify CSV出力</li></ul><a id="pricingBuyStandardBtn" class="upgradeBtn" href="#licenseCard">Standardを購入</a></div>
     </div>
   </div>
 </section>
@@ -168,17 +168,17 @@
 
   <div id="licenseFreeState">
     <div class="license-row">
-      <input id="licenseKeyInput" type="text" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX">
+      <input id="licenseEmailInput" type="email" autocomplete="email" placeholder="購入時のメールアドレス">
+      <input id="licenseKeyInput" type="text" autocomplete="off" placeholder="ライセンスキー">
       <button id="activateLicenseBtn" class="primary" type="button">ライセンスを認証</button>
     </div>
     <p id="licenseMessage" class="license-message">現在はFreeプラン（最大20商品）です。</p>
-    <button id="buyStandardBtn" class="secondary" type="button" disabled>Standard ¥2,980（準備中）</button>
+    <button id="buyStandardBtn" class="secondary" type="button">Standard ¥2,980を購入</button>
   </div>
 
   <div id="licenseStandardState" class="hidden">
     <div class="notice ok">
-      Standardが有効です。最大1,000商品まで変換できます。
-      <span id="licenseExpiryText"></span>
+      Standardが有効です。1回につき最大1,000商品まで変換できます。
     </div>
     <button id="deactivateLicenseBtn" class="secondary" type="button">この端末の認証を解除</button>
   </div>
@@ -194,6 +194,7 @@
 <script src="js/parser.js"></script>
 <script src="js/converter.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/config.js"></script>
 <script src="js/license.js"></script>
 <script src="js/app.js"></script>
 </body>

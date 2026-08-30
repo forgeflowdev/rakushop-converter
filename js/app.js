@@ -98,9 +98,10 @@
     U.renderPreview(state.output);
     $("#previewCount").textContent=`${state.output.length} 行`;
     $("#status").className="notice ok";
-    const freeLimitReached=state.lastAnalysis.productCount>20;
+    const licenseState=ForgeFlowLicense.getState();
+    const freeLimitReached=licenseState.plan==="free" && state.lastAnalysis.productCount>ForgeFlowLicense.FREE_LIMIT;
     $("#status").textContent=freeLimitReached
-      ? `Free版では先頭20商品を出力しています（読み込み: ${state.lastAnalysis.productCount}商品）。Standardは最大1,000商品に対応予定です。`
+      ? `Free版では先頭20商品を出力しています（読み込み: ${state.lastAnalysis.productCount}商品）。Standardなら1回につき最大1,000商品まで変換できます。`
       : `Shopify CSVプレビューを作成しました（${state.output.length} 行）。`;
 
     setTimeout(()=>{
@@ -155,23 +156,18 @@
 
   // ---------- License UI ----------
   function renderLicenseState(){
-    const state=ForgeFlowLicense.getState();
+    const licenseState=ForgeFlowLicense.getState();
     const badge=document.querySelector("#planBadge");
     const freeBox=document.querySelector("#licenseFreeState");
     const stdBox=document.querySelector("#licenseStandardState");
-    const expiry=document.querySelector("#licenseExpiryText");
 
     if(!badge || !freeBox || !stdBox) return;
 
-    if(state.plan==="standard"){
+    if(licenseState.plan==="standard"){
       badge.textContent="Standard";
       badge.className="plan-badge standard";
       freeBox.classList.add("hidden");
       stdBox.classList.remove("hidden");
-      if(expiry && state.license?.expiresAt){
-        const d=new Date(state.license.expiresAt);
-        expiry.textContent=`（有効期限: ${d.toLocaleDateString("ja-JP")}）`;
-      }
     }else{
       badge.textContent="Free";
       badge.className="plan-badge free";
@@ -180,17 +176,41 @@
     }
   }
 
+  function openCheckout(){
+    const url=String(window.FORGEFLOW_CHECKOUT_URL||"").trim();
+    if(!url){
+      const msg=document.querySelector("#licenseMessage");
+      if(msg) msg.textContent="購入リンクがまだ設定されていません。";
+      return;
+    }
+    window.open(url,"_blank","noopener,noreferrer");
+  }
+
+  const buyBtn=document.querySelector("#buyStandardBtn");
+  if(buyBtn) buyBtn.addEventListener("click",openCheckout);
+  const pricingBuyBtn=document.querySelector("#pricingBuyStandardBtn");
+  if(pricingBuyBtn){
+    pricingBuyBtn.addEventListener("click",e=>{
+      if(String(window.FORGEFLOW_CHECKOUT_URL||"").trim()){
+        e.preventDefault();
+        openCheckout();
+      }
+    });
+  }
+
   const activateBtn=document.querySelector("#activateLicenseBtn");
   if(activateBtn){
     activateBtn.addEventListener("click",async()=>{
       const input=document.querySelector("#licenseKeyInput");
+      const email=document.querySelector("#licenseEmailInput");
       const msg=document.querySelector("#licenseMessage");
       activateBtn.disabled=true;
       if(msg) msg.textContent="ライセンスを確認しています...";
       try{
-        await ForgeFlowLicense.activate(input?.value||"");
+        await ForgeFlowLicense.activate(input?.value||"",email?.value||"");
         if(msg) msg.textContent="Standardを有効化しました。";
         renderLicenseState();
+        hideOutput();
       }catch(e){
         if(msg) msg.textContent=e.message;
       }finally{
@@ -201,13 +221,20 @@
 
   const deactivateBtn=document.querySelector("#deactivateLicenseBtn");
   if(deactivateBtn){
-    deactivateBtn.addEventListener("click",()=>{
-      ForgeFlowLicense.clear();
-      renderLicenseState();
-      location.reload();
+    deactivateBtn.addEventListener("click",async()=>{
+      deactivateBtn.disabled=true;
+      try{
+        await ForgeFlowLicense.deactivate();
+        renderLicenseState();
+        location.reload();
+      }catch(e){
+        alert(e.message||"認証解除に失敗しました。");
+        deactivateBtn.disabled=false;
+      }
     });
   }
 
   renderLicenseState();
+  ForgeFlowLicense.validate().then(renderLicenseState);
 
 })();
