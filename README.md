@@ -1,4 +1,4 @@
-ForgeFlow v3.8.6 LICENSE STATE SYNC FIX
+ForgeFlow v3.8.7 LIVE CHECKOUT
 
 # ForgeFlow - RakShop Converter
 
@@ -167,3 +167,8 @@ Additional boundary-value warnings:
 - If a license activation is manually deactivated in Lemon Squeezy, the next validation now clears stale local Standard state and returns ForgeFlow to Free.
 - The in-app "この端末の認証を解除" action now also succeeds locally when Lemon Squeezy reports that the instance is already missing/deactivated.
 - Temporary network or 5xx server failures still keep the local activation so users can retry without losing the instance reference.
+
+
+## v3.8.7
+- Switched the Standard purchase checkout URL from Lemon Squeezy Test Mode to the Live Mode checkout.
+- License API endpoint remains the deployed Cloudflare Worker.
