@@ -11,9 +11,15 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>楽天CSVをShopify CSVへ変換 | ForgeFlow</title>
-  <!-- ForgeFlow RakShop Converter v3.8.0 SALES READY -->
-  <meta name="description" content="楽天の商品CSVをShopify形式へかんたん変換。インストール不要、ブラウザ内処理。Free版は最大20商品まで無料で試せます。">
+  <title>楽天RMSの商品CSVをShopify CSVへ変換 | ForgeFlow</title>
+  <!-- ForgeFlow RakShop Converter v3.9.2 SEO -->
+  <meta name="description" content="楽天RMSの商品CSVをShopify商品CSVへ変換。楽天市場からShopifyへの商品移行に必要なCSV整形をブラウザ上で簡単に。インストール不要、最大20商品まで無料で試せます。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://forgeflowtools.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="楽天RMSの商品CSVをShopify CSVへ変換 | ForgeFlow">
+  <meta property="og:description" content="楽天市場の商品CSVをShopify向けCSVへ。ブラウザ内で変換でき、最大20商品まで無料で試せます。">
+  <meta property="og:url" content="https://forgeflowtools.com/">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -30,9 +36,9 @@
 <header class="hero">
   <div class="container heroGrid">
     <div>
-      <span class="eyebrow">楽天 → Shopify 移行をもっと簡単に</span>
-      <h1>楽天CSVを<br><span class="grad">Shopify形式へ。</span></h1>
-      <p>楽天の商品CSVを読み込み、Shopify商品CSVへ変換。インストール不要で、商品データはブラウザ内で処理します。</p>
+      <span class="eyebrow">楽天RMS → Shopifyの商品移行をもっと簡単に</span>
+      <h1>楽天RMSの商品CSVを<br><span class="grad">Shopify CSVへ変換。</span></h1>
+      <p>楽天市場の商品CSVを読み込み、Shopifyへインポートしやすい商品CSVへ変換します。面倒なCSV整形を減らし、インストール不要・ブラウザ内処理で商品移行をサポートします。</p>
       <div class="ctas">
         <a class="btn btnPrimary" href="#converter">無料で試す / 最大20商品</a>
         <a class="btn btnSecondary" href="#how">使い方を見る</a>
@@ -58,7 +64,18 @@
   </div>
 </section>
 
-<section class="section" id="features">
+<section class="section" id="migration">
+  <div class="container">
+    <div class="center"><h2>楽天市場からShopifyへの商品移行をCSVで効率化</h2><p class="lead">楽天RMSから出力した商品データとShopifyの商品CSVでは、項目名や形式が異なります。ForgeFlowは楽天の商品CSVを読み込み、Shopify向けのCSVへ変換することで、手作業での列合わせやCSV整形を減らします。</p></div>
+    <div class="features">
+      <div class="feature"><span class="icon">📦</span><h3>楽天RMSの商品CSVに対応</h3><p>商品名・価格・SKU・在庫・画像URLなどの候補列を判定し、Shopifyの商品データへ変換します。</p></div>
+      <div class="feature"><span class="icon">🔄</span><h3>Shopify商品CSVを作成</h3><p>変換結果を画面で確認してから、Shopifyへの商品インポートに使えるCSVとしてダウンロードできます。</p></div>
+      <div class="feature"><span class="icon">🛡️</span><h3>まず20商品まで無料</h3><p>Free版で実際の楽天CSVを使って変換結果を確認できます。大量移行の前に少量の商品で試せます。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="features">
   <div class="container">
     <div class="center"><h2>移行作業をシンプルに</h2><p class="lead">単純な列変換だけでなく、投入前に気づきたい問題も確認します。</p></div>
     <div class="features">
@@ -69,7 +86,7 @@
   </div>
 </section>
 
-<section class="section alt" id="converter">
+<section class="section" id="converter">
   <div class="container">
     <div class="center"><h2>無料で試す</h2><p class="lead">Free版は先頭20商品までShopify CSVとして出力できます。</p></div>
     <div class="toolWrap">
@@ -142,7 +159,7 @@
   </div>
 </section>
 
-<section class="section" id="pricing">
+<section class="section alt" id="pricing">
   <div class="container">
     <div class="center"><h2>料金</h2><p class="lead">まずは無料で変換精度をお試しいただけます。Standardなら最大1,000商品まで一括変換できます。</p></div>
     <div class="pricing">
@@ -153,13 +170,15 @@
   </div>
 </section>
 
-<section class="section alt" id="faq">
+<section class="section" id="faq">
   <div class="container">
     <div class="center"><h2>よくある質問</h2><p class="lead">公開初期版のため、実際の楽天CSVによっては手動で列指定が必要な場合があります。</p></div>
     <div class="faq">
       <details><summary>CSVデータはサーバーに保存されますか？</summary><p>このバージョンでは変換処理をブラウザ内で行うため、商品CSVをForgeFlowのサーバーへ送信・保存しません。</p></details>
       <details><summary>楽天RMSのCSVなら必ず変換できますか？</summary><p>楽天側の出力形式や店舗設定により列構成が異なる場合があります。自動判定が合わない場合は、画面上で列の対応を変更できます。</p></details>
       <details><summary>Shopifyへそのままインポートできますか？</summary><p>Shopify側の仕様変更やデータ内容によって追加修正が必要になる場合があります。本番商品を大量投入する前に少量でテストしてください。</p></details>
+      <details><summary>楽天市場からShopifyへの移行で何が楽になりますか？</summary><p>楽天RMSの商品CSVをShopify向けの商品CSVへ整形する作業を自動化します。商品名・価格・SKU・在庫・画像URLなどの列を判定し、手作業でのコピーや列合わせを減らせます。</p></details>
+      <details><summary>無料版とStandard版の違いは？</summary><p>Free版は1回につき最大20商品、Standard版は1回につき最大1,000商品まで変換できます。Standard版は¥2,980の買い切りです。</p></details>
     </div>
   </div>
 </section>
