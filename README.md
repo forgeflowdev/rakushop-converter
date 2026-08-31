@@ -1,4 +1,4 @@
-ForgeFlow v3.8.9 LEMON MOR ALIGNMENT
+ForgeFlow v3.9.0 GA4
 
 # ForgeFlow - RakShop Converter
 
@@ -7,6 +7,12 @@ Rakuten CSV → Shopify CSV converter.
 Website: https://forgeflowtools.com
 
 Status: Beta
+
+## v3.9.0 - Google Analytics 4
+- Added Google tag to all public HTML pages.
+- Measurement ID: G-BM155CWDQR
+- Updated Privacy Policy to disclose Google Analytics usage.
+- No converter logic, license API, checkout URL, or plan-limit behavior changed.
 
 ## v3.8.9 - Lemon Squeezy Merchant of Record alignment
 - Clarified that Lemon Squeezy processes Standard purchases as Merchant of Record.
