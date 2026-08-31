@@ -1,4 +1,4 @@
-ForgeFlow v3.9.0 GA4
+ForgeFlow v3.9.1 SITEMAP + ROBOTS
 
 # ForgeFlow - RakShop Converter
 
@@ -7,6 +7,11 @@ Rakuten CSV → Shopify CSV converter.
 Website: https://forgeflowtools.com
 
 Status: Beta
+
+## v3.9.1 - Sitemap and robots.txt
+- Added sitemap.xml for the public ForgeFlow pages.
+- Added robots.txt allowing normal crawling and advertising the sitemap URL.
+- No converter logic, GA4 measurement ID, license API, checkout URL, or plan-limit behavior changed.
 
 ## v3.9.0 - Google Analytics 4
 - Added Google tag to all public HTML pages.
